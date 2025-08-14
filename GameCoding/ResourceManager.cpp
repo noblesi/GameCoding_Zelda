@@ -2,15 +2,16 @@
 #include "ResourceManager.h"
 #include "Texture.h"
 #include "Sprite.h"
+#include "Flipbook.h"
 
 ResourceManager::~ResourceManager()
 {
 	Clear();
 }
 
-void ResourceManager::Init(HWND hWnd, fs::path resourcePath)
+void ResourceManager::Init(HWND hwnd, fs::path resourcePath)
 {
-	_hWnd = hWnd;
+	_hwnd = hwnd;
 	_resourcePath = resourcePath;
 
 	
@@ -23,6 +24,16 @@ void ResourceManager::Clear()
 		SAFE_DELETE(item.second);
 
 	_textures.clear();
+
+	for (auto& item : _sprites)
+		SAFE_DELETE(item.second);
+
+	_sprites.clear();
+
+	for (auto& item : _flipbooks)
+		SAFE_DELETE(item.second);
+
+	_flipbooks.clear();
 }
 
 Texture* ResourceManager::LoadTexture(const wstring& key, const wstring& path, uint32 transparent)
@@ -33,7 +44,7 @@ Texture* ResourceManager::LoadTexture(const wstring& key, const wstring& path, u
 	fs::path fullPath = _resourcePath / path;
 
 	Texture* texture = new Texture();
-	texture->LoadBmp(_hWnd, fullPath.c_str());
+	texture->LoadBmp(_hwnd, fullPath.c_str());
 	texture->SetTransparent(transparent);
 	_textures[key] = texture;
 
@@ -56,4 +67,15 @@ Sprite* ResourceManager::CreateSprite(const wstring& key, Texture* texture, int3
 	_sprites[key] = sprite;
 
 	return sprite;
+}
+
+Flipbook* ResourceManager::CreateFlipbook(const wstring& key)
+{
+	if (_flipbooks.find(key) != _flipbooks.end())
+		return _flipbooks[key];
+
+	Flipbook* fb = new Flipbook();
+	_flipbooks[key] = fb;
+
+	return fb;
 }

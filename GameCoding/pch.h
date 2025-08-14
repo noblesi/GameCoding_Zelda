@@ -11,8 +11,11 @@
 #include <list>
 #include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <string>
 #include <algorithm>
+#include <functional>
 using namespace std;
 
 // C++20
@@ -27,3 +30,5 @@ namespace fs = std::filesystem;
 #ifdef _DEBUG
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
+
+#pragma comment(lib, "msimg32.lib")
