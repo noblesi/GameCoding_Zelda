@@ -3,6 +3,8 @@
 #include "Texture.h"
 #include "Sprite.h"
 #include "Flipbook.h"
+#include "Tilemap.h"
+#include "Sound.h"
 
 ResourceManager::~ResourceManager()
 {
@@ -34,6 +36,16 @@ void ResourceManager::Clear()
 		SAFE_DELETE(item.second);
 
 	_flipbooks.clear();
+
+	for (auto& item : _tilemaps)
+		SAFE_DELETE(item.second);
+
+	_tilemaps.clear();
+
+	for (auto& item : _sounds)
+		SAFE_DELETE(item.second);
+
+	_sounds.clear();
 }
 
 Texture* ResourceManager::LoadTexture(const wstring& key, const wstring& path, uint32 transparent)
@@ -78,4 +90,52 @@ Flipbook* ResourceManager::CreateFlipbook(const wstring& key)
 	_flipbooks[key] = fb;
 
 	return fb;
+}
+
+Tilemap* ResourceManager::CreateTilemap(const wstring& key)
+{
+	if (_tilemaps.find(key) != _tilemaps.end())
+		return _tilemaps[key];
+
+	Tilemap* tm = new Tilemap();
+	_tilemaps[key] = tm;
+
+	return tm;
+}
+
+void ResourceManager::SaveTilemap(const wstring& key, const wstring& path)
+{
+	Tilemap* tilemap = GetTilemap(key);
+
+	fs::path fullPath = _resourcePath / path;
+	tilemap->SaveFile(fullPath);
+}
+
+Tilemap* ResourceManager::LoadTilemap(const wstring& key, const wstring& path)
+{
+	Tilemap* tilemap = nullptr;
+
+	if (_tilemaps.find(key) == _tilemaps.end())
+		_tilemaps[key] = new Tilemap();
+
+	tilemap = _tilemaps[key];
+
+	fs::path fullPath = _resourcePath / path;
+	tilemap->LoadFile(fullPath);
+
+	return tilemap;
+}
+
+Sound* ResourceManager::LoadSound(const wstring& key, const wstring& path)
+{
+	if (_sounds.find(key) != _sounds.end())
+		return _sounds[key];
+
+	fs::path fullPath = _resourcePath / path;
+
+	Sound* sound = new Sound();
+	sound->LoadWave(fullPath);
+	_sounds[key] = sound;
+
+	return sound;
 }
