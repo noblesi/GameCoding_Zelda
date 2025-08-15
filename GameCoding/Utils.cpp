@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Utils.h"
 
 void Utils::DrawText(HDC hdc, Pos pos, const wstring& str)
@@ -32,4 +32,24 @@ void Utils::DrawLineColored(HDC hdc, Pos from, Pos to, COLORREF color)
 
 	::SelectObject(hdc, oldPen);
 	::DeleteObject(pen);
+}
+
+void Utils::ReadBmp(const wstring& path)
+{
+	FILE* fp = nullptr;
+
+	if (::_wfopen_s(&fp, path.c_str(), L"rb") != 0)
+		return;
+
+	BITMAPFILEHEADER fileHeader = {};
+	::fread_s(&fileHeader, sizeof(fileHeader), sizeof(fileHeader), 1, fp);
+
+	BITMAPINFOHEADER infoHeader = {};
+	::fread_s(&infoHeader, sizeof(infoHeader), sizeof(infoHeader), 1, fp);
+
+	int32 imgSize = infoHeader.biWidth * infoHeader.biHeight * 4;
+	char* buffer = (char*)::malloc(imgSize);
+	fread_s(buffer, imgSize, imgSize, 1, fp);
+
+	//::free(buffer)
 }
