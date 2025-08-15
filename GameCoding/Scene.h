@@ -1,4 +1,7 @@
-#pragma once
+﻿#pragma once
+
+class Actor;
+class UI;
 
 class Scene
 {
@@ -10,7 +13,11 @@ public:
 	virtual void Update() abstract;
 	virtual void Render(HDC hdc) abstract;
 
-protected:
-	
+	void AddActor(Actor* actor);
+	void RemoveActor(Actor* actor);
+
+public:
+	vector<Actor*> _actors[LAYER_MAXCOUNT];
+	vector<UI*> _uis;
 };
 

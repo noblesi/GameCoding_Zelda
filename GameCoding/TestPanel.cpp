@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "TestPanel.h"
-#include "TestButton.h"
 #include "ResourceManager.h"
+#include "Button.h"
 
 TestPanel::TestPanel()
 {

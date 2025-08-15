@@ -14,9 +14,9 @@ Texture* Texture::LoadBmp(HWND hwnd, const wstring& path)
     HDC hdc = ::GetDC(hwnd);
 
     _hdc = ::CreateCompatibleDC(hdc);
-    _bitmap = (HBITMAP)::LoadImage(nullptr, path.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    _bitmap = (HBITMAP)::LoadImage(nullptr, path.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_DEFAULTSIZE);
 
-    if (_bitmap == 0)
+    if (_bitmap == NULL)
         ::MessageBox(hwnd, path.c_str(), L"Image Load Failed", NULL);
 
     HBITMAP prev = (HBITMAP)::SelectObject(_hdc, _bitmap);
