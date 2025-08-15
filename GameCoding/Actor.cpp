@@ -55,6 +55,17 @@ void Actor::RemoveComponent(Component* component)
     _components.erase(findIt);
 }
 
+Component* Actor::GetCollider()
+{
+    for (Component* component : _components)
+    {
+        if (dynamic_cast<Collider*>(component))
+            return component;
+    }
+
+    return nullptr;
+}
+
 void Actor::OnComponentBeginOverlap(Collider* collider, Collider* other)
 {
 }

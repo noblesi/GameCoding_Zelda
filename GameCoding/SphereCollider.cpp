@@ -47,6 +47,9 @@ void SphereCollider::Render(HDC hdc)
 
 bool SphereCollider::CheckCollision(Collider* other)
 {
+    if (Super::CheckCollision(other) == false)
+        return false;
+
     switch (other->GetColliderType())
     {
     case ColliderType::Box:
