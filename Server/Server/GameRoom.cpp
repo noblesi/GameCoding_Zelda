@@ -116,11 +116,71 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	if (gameObject == nullptr)
 		return;
 
-	// TODO : Validation
+	PlayerRef player = dynamic_pointer_cast<Player>(gameObject);
+	if (player == nullptr)
+		return;
+
+	Vec2Int curPos = gameObject->GetCellPos();
+	Vec2Int targetPos{ pkt.info().posx(), pkt.info().posy() };
+	Vec2Int delta = targetPos - curPos; // 목표 지점과 현재 위치의 차이 계산
+
+	auto sendCorrection = [&]()
+		{
+			// 서버기준 위치로 수정 패킷 전송
+			SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
+
+			if (player->session)
+				player->session->Send(sendBuffer);
+		};
+
+	bool invalid = false; // 검증 실패 여부
+
+	if (delta.LengthSquared() > 1)
+		invalid = true; // 한번에 두 칸이상 이동하면 무효
+
+	if (pkt.info().state() == MOVE && delta.LengthSquared() == 0)
+		invalid = true; // 이동상태인데 좌표변화가 없으면 무효
+
+	if (delta.LengthSquared() == 1)
+	{
+		// 이동방향이 맞는지 확인
+		Dir expectedDir = DIR_UP;
+		if (delta.x == 1 && delta.y == 0) expectedDir = DIR_RIGHT;
+		else if (delta.x == -1 && delta.y == 0) expectedDir = DIR_LEFT;
+		else if (delta.x == 0 && delta.y == 1) expectedDir = DIR_DOWN;
+		else if (delta.x == 0 && delta.y == -1) expectedDir = DIR_UP;
+
+		if (pkt.info().dir() != expectedDir)
+			invalid = true; // 방향 불일치
+	}
+
+	if (CanGo(targetPos) == false)
+		invalid = true; // 벽 또는 다른 오브젝트와 충돌
+
+	if (invalid)
+	{
+		cout << "Invalid move packet from object" << id << endl; // 서버 로그 출력
+		player->invalidMoveCount++;
+		if (player->invalidMoveCount >= 5)
+		{
+			// 반복 위반시 세션 종료
+			if (player->session)
+				player->session->Disconnect(L"Invalid Move Packet");
+		}
+		else
+		{
+			sendCorrection(); // 위치 수정 패킷 전송
+		}
+
+		return;
+	}
+
+	player->invalidMoveCount = 0;
+
 	gameObject->info.set_state(pkt.info().state());
 	gameObject->info.set_dir(pkt.info().dir());
-	gameObject->info.set_posx(pkt.info().posx());
-	gameObject->info.set_posy(pkt.info().posy());
+	gameObject->info.set_posx(targetPos.x);
+	gameObject->info.set_posy(targetPos.y); // 서버에 최종 좌표 저장
 
 	{
 		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
