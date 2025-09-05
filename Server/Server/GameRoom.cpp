@@ -111,21 +111,76 @@ GameObjectRef GameRoom::FindObject(uint64 id)
 
 void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 {
-	uint64 id = pkt.info().objectid();
-	GameObjectRef gameObject = FindObject(id);
-	if (gameObject == nullptr)
-		return;
+        uint64 id = pkt.info().objectid();
+        GameObjectRef gameObject = FindObject(id);
+        if (gameObject == nullptr)
+                return;
 
-	// TODO : Validation
-	gameObject->info.set_state(pkt.info().state());
-	gameObject->info.set_dir(pkt.info().dir());
-	gameObject->info.set_posx(pkt.info().posx());
-	gameObject->info.set_posy(pkt.info().posy());
+        PlayerRef player = dynamic_pointer_cast<Player>(gameObject);
+        if (player == nullptr)
+                return;
 
-	{
-		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
-		Broadcast(sendBuffer);
-	}
+        Vec2Int curPos = gameObject->GetCellPos();
+        Vec2Int targetPos{ pkt.info().posx(), pkt.info().posy() };
+        Vec2Int delta = targetPos - curPos;
+
+        auto sendCorrection = [&]()
+        {
+                SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
+                if (player->session)
+                        player->session->Send(sendBuffer);
+        };
+
+        bool invalid = false;
+
+        if (delta.LengthSquared() > 1)
+                invalid = true;
+
+        if (pkt.info().state() == MOVE && delta.LengthSquared() == 0)
+                invalid = true;
+
+        if (delta.LengthSquared() == 1)
+        {
+                Dir expectedDir = DIR_UP;
+                if (delta.x == 1 && delta.y == 0) expectedDir = DIR_RIGHT;
+                else if (delta.x == -1 && delta.y == 0) expectedDir = DIR_LEFT;
+                else if (delta.x == 0 && delta.y == 1) expectedDir = DIR_DOWN;
+                else if (delta.x == 0 && delta.y == -1) expectedDir = DIR_UP;
+
+                if (pkt.info().dir() != expectedDir)
+                        invalid = true;
+        }
+
+        if (CanGo(targetPos) == false)
+                invalid = true;
+
+        if (invalid)
+        {
+                cout << "Invalid move packet from object " << id << endl;
+                player->invalidMoveCount++;
+                if (player->invalidMoveCount >= 5)
+                {
+                        if (player->session)
+                                player->session->Disconnect(L"Invalid Move Packet");
+                }
+                else
+                {
+                        sendCorrection();
+                }
+                return;
+        }
+
+        player->invalidMoveCount = 0;
+
+        gameObject->info.set_state(pkt.info().state());
+        gameObject->info.set_dir(pkt.info().dir());
+        gameObject->info.set_posx(targetPos.x);
+        gameObject->info.set_posy(targetPos.y);
+
+        {
+                SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
+                Broadcast(sendBuffer);
+        }
 }
 
 void GameRoom::AddObject(GameObjectRef gameObject)

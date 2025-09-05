@@ -4,10 +4,11 @@
 class Player : public GameObject
 {
 public:
-	Player();
-	virtual ~Player();
+        Player();
+        virtual ~Player();
 
 public:
-	GameSessionRef session;
+        GameSessionRef session;
+        int32 invalidMoveCount = 0;
 };
 
