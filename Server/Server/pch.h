@@ -84,7 +84,7 @@ struct VectorInt
 		return y > other.y;
 	}
 
-	bool operator==(const VectorInt& other)
+	bool operator==(const VectorInt& other) const
 	{
 		return x == other.x && y == other.y;
 	}

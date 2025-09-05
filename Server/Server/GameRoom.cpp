@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Monster.h"
 #include "GameSession.h"
+#include <filesystem>
 
 GameRoomRef GRoom = make_shared<GameRoom>();
 
@@ -23,7 +24,8 @@ void GameRoom::Init()
 	monster->info.set_posy(8);
 	AddObject(monster);
 
-	_tilemap.LoadFile(L"C:\\Users\\MSKim\\Desktop\\GameCoding_Zelda\\Server\\Client\\Resources\\Tilemap\\Tilemap_01.txt");
+	std::filesystem::path tilemapPath = std::filesystem::current_path() / "Resources" / "Tilemap" / "Tilemap_01.txt";
+	_tilemap.LoadFile(tilemapPath.wstring());
 }
 
 void GameRoom::Update()
