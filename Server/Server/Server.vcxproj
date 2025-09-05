@@ -193,6 +193,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Protocol.pb.h" />
     <ClInclude Include="ServerPacketHandler.h" />
+    <ClInclude Include="Shutdown.h" />
     <ClInclude Include="Struct.pb.h" />
     <ClInclude Include="Tilemap.h" />
   </ItemGroup>
