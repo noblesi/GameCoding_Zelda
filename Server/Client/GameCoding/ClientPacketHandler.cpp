@@ -87,7 +87,7 @@ void ClientPacketHandler::Handle_S_MyPlayer(ServerSessionRef session, BYTE* buff
 	{
 		auto myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
 		myPlayer->info = info;
-		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer);
+		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer.get());
 	}
 }
 

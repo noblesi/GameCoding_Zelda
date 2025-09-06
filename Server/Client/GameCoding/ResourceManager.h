@@ -1,11 +1,11 @@
 ﻿#pragma once
+#include "Sound.h"
+#include "Texture.h"
+#include "Sprite.h"
+#include "Tilemap.h"
+#include "Flipbook.h"
 
 class ResourceBase;
-class Texture;
-class Sprite;
-class Flipbook;
-class Tilemap;
-class Sound;
 
 class ResourceManager
 {
