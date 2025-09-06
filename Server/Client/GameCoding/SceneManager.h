@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class Scene;
 class MyPlayer;
@@ -16,7 +16,7 @@ public:
 
 public:
 	void ChangeScene(SceneType sceneType);
-	Scene* GetCurrentScene() { return _scene;}
+	Scene* GetCurrentScene() { return _scene.get();}
 
 	class DevScene* GetDevScene();
 
@@ -25,7 +25,7 @@ public:
 	void SetMyPlayer(MyPlayer* myPlayer) { _myPlayer = myPlayer; }
 
 private:
-	Scene* _scene;
+	unique_ptr<Scene> _scene;
 	SceneType _sceneType = SceneType::None;
 	MyPlayer* _myPlayer = nullptr;
 

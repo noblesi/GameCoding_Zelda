@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SceneManager.h"
 #include "DevScene.h"
 #include "EditScene.h"
@@ -23,7 +23,7 @@ void SceneManager::Render(HDC hdc)
 
 void SceneManager::Clear()
 {
-	SAFE_DELETE(_scene);
+	_scene.reset();
 }
 
 void SceneManager::ChangeScene(SceneType sceneType)
@@ -31,24 +31,22 @@ void SceneManager::ChangeScene(SceneType sceneType)
 	if (_sceneType == sceneType)
 		return;
 
-	Scene* newScene = nullptr;
+	unique_ptr<Scene> newScene;
 
 	switch (sceneType)
 	{
 		case SceneType::DevScene:
-			newScene = new DevScene();
+			newScene = make_unique<DevScene>();
 			break;
 		case SceneType::EditScene:
-			newScene = new EditScene();
+			newScene = make_unique<EditScene>();
 			break;
 	}
 
-	SAFE_DELETE(_scene);
-
-	_scene = newScene;
+	_scene = move(newScene);
 	_sceneType = sceneType;
 
-	newScene->Init();
+	_scene->Init();
 }
 
 class DevScene* SceneManager::GetDevScene()

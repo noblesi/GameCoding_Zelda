@@ -1,6 +1,5 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "Tilemap.h"
-#include <iostream>
 #include <fstream>
 
 Tilemap::Tilemap()
@@ -15,63 +14,35 @@ Tilemap::~Tilemap()
 
 void Tilemap::LoadFile(const wstring& path)
 {
-	// C Ω∫≈∏¿œ
-	if (false)
-	{
-		FILE* file = nullptr;
-
-		::_wfopen_s(&file, path.c_str(), L"rb");
-		assert(file);
-
-		::fread(&_mapSize.x, sizeof(_mapSize.x), 1, file);
-		::fread(&_mapSize.y, sizeof(_mapSize.y), 1, file);
-
-		for (int32 y = 0; y < _mapSize.y; y++)
-		{
-			for (int32 x = 0; x < _mapSize.x; x++)
-			{
-				int32 value = -1;
-				::fread(&value, sizeof(value), 1, file);
-				_tiles[y][x].value = value;
-			}
-		}
-
-		::fclose(file);
+	std::wifstream ifs(path);
+	if (ifs.is_open() == false)
 		return;
-	}
 
-	// C++ Ω∫≈∏¿œ
+	ifs >> _mapSize.x >> _mapSize.y;
+
+	SetMapSize(_mapSize);
+
+	for (int32 y = 0; y < _mapSize.y; y++)
 	{
-		wifstream ifs;
+		std::wstring line;
+		ifs >> line;
 
-		ifs.open(path);
-
-		ifs >> _mapSize.x >> _mapSize.y;
-
-		SetMapSize(_mapSize);
-
-		for (int32 y = 0; y < _mapSize.y; y++)
+		for (int32 x = 0; x < _mapSize.x; x++)
 		{
-			wstring line;
-			ifs >> line;
-
-			for (int32 x = 0; x < _mapSize.x; x++)
-			{
-				_tiles[y][x].value = line[x] - L'0';
-			}
+			_tiles[y][x].value = line[x] - L'0';
 		}
-
-		ifs.close();
 	}
+
+	
 
 }
 
-Tile* Tilemap::GetTileAt(Vec2Int pos)
+std::optional<std::reference_wrapper<Tile>> Tilemap::GetTileAt(Vec2Int pos)
 {
 	if (pos.x < 0 || pos.x >= _mapSize.x || pos.y < 0 || pos.y >= _mapSize.y)
-		return nullptr;
+		return std::nullopt;
 
-	return &_tiles[pos.y][pos.x];
+	return _tiles[pos.y][pos.x];
 }
 
 void Tilemap::SetMapSize(Vec2Int size)

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ClientPacketHandler.h"
 #include "BufferReader.h"
 #include "DevScene.h"
@@ -85,7 +85,7 @@ void ClientPacketHandler::Handle_S_MyPlayer(ServerSessionRef session, BYTE* buff
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
 	{
-		MyPlayer* myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
+		auto myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
 		myPlayer->info = info;
 		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer);
 	}

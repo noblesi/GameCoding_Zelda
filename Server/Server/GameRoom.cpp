@@ -400,15 +400,15 @@ bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 
 
 bool GameRoom::CanGo(Vec2Int cellPos)
 {
-	Tile* tile = _tilemap.GetTileAt(cellPos);
-	if (tile == nullptr)
+	auto tile = _tilemap.GetTileAt(cellPos);
+	if (tile.has_value() == false)
 		return false;
 
 	// 몬스터 충돌?
 	if (GetGameObjectAt(cellPos) != nullptr)
 		return false;
 
-	return tile->value != 1;
+	return tile->get().value != 1;
 }
 
 Vec2Int GameRoom::GetRandomEmptyCellPos()

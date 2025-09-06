@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class GameObject;
 
@@ -10,13 +10,14 @@ public:
 	template<typename T>
 	T* AddObject()
 	{
-		T* object = new T();
+		auto object = make_unique<T>();
 
 		int64 id = _idGenerator++;
 		object->SetObjectID(id);
-		_objects[id] = object;
+		T* raw = object.get();
+		_objects[id] = move(object);
 
-		return object;
+		return raw;
 	}
 
 	void RemoveObject(int64 id)
@@ -26,11 +27,10 @@ public:
 			return;
 
 		_objects.erase(id);
-		// TODO : Delete?
 	}
 
 private:
 	int64 _idGenerator = 1;
-	unordered_map<int64, GameObject*> _objects;
+	unordered_map<int64, unique_ptr<GameObject>> _objects;
 };
 

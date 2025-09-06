@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Scene.h"
 #include <type_traits>
 
@@ -41,22 +41,24 @@ public:
 	void LoadTilemap();	
 
 	template<typename T>
-	T* SpawnObject(Vec2Int pos)
+	shared_ptr<T> SpawnObject(Vec2Int pos)
 	{
 		auto isGameObject = std::is_convertible_v<T*, GameObject*>;
 		assert(isGameObject);
 
-		T* ret = new T();
+		shared_ptr<T> ret = make_shared<T>();
 		ret->SetCellPos(pos, true);
-		AddActor(ret);
+		AddActor(ret.get());
 
 		ret->BeginPlay();
+
+		_ownedActors.push_back(ret);
 
 		return ret;
 	} 
 
 	template<typename T>
-	T* SpawnObjectAtRandomPos()
+	shared_ptr<T> SpawnObjectAtRandomPos()
 	{
 		Vec2Int randPos = GetRandomEmptyCellPos();
 		return SpawnObject<T>(randPos);
@@ -79,7 +81,8 @@ private:
 	void TickMonsterSpawn();
 
 	const int32 DESIRED_COUNT = 1;
-	class TilemapActor* _tilemapActor = nullptr;
+	shared_ptr<class TilemapActor> _tilemapActor;
 	int32 _monsterCount = 0;
+	vector<shared_ptr<Actor>> _ownedActors;
 };
 

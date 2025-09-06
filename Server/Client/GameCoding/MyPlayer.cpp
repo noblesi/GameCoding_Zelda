@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "MyPlayer.h"
 #include "InputManager.h"
 #include "TimeManager.h"
@@ -12,7 +12,7 @@
 
 MyPlayer::MyPlayer()
 {
-	CameraComponent* camera = new CameraComponent();
+	auto camera = make_shared<CameraComponent>();
 	AddComponent(camera);
 }
 

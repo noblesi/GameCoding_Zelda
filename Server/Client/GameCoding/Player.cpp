@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Player.h"
 #include "InputManager.h"
 #include "TimeManager.h"
@@ -120,7 +120,7 @@ void Player::TickSkill()
 		}
 		else if (_weaponType == WeaponType::Bow)
 		{
-			Arrow* arrow = scene->SpawnObject<Arrow>(GetCellPos());
+			auto arrow = scene->SpawnObject<Arrow>(GetCellPos());
 			arrow->SetDir(info.dir());	
 		}
 

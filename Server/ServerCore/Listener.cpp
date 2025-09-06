@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "Listener.h"
 #include "SocketUtils.h"
 #include "IocpEvent.h"
@@ -12,12 +12,6 @@
 Listener::~Listener()
 {
 	SocketUtils::Close(_socket);
-
-	for (IocpEvent* acceptEvent : _acceptEvents)
-	{
-		// TODO
-		delete acceptEvent;
-	}
 }
 
 bool Listener::StartAccept(ServerServiceRef service)
@@ -48,10 +42,10 @@ bool Listener::StartAccept(ServerServiceRef service)
 	const int32 acceptCount = _service->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; i++)
 	{
-		IocpEvent* acceptEvent = new IocpEvent(EventType::Accept);
+		auto acceptEvent = std::make_unique<IocpEvent>(EventType::Accept);
 		acceptEvent->owner = shared_from_this();
-		_acceptEvents.push_back(acceptEvent);
-		RegisterAccept(acceptEvent);
+		_acceptEvents.push_back(std::move(acceptEvent));
+		RegisterAccept(_acceptEvents.back().get());
 	}
 
 	return true;
@@ -86,7 +80,7 @@ void Listener::RegisterAccept(IocpEvent* acceptEvent)
 		const int32 errorCode = ::WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			// ¿œ¥‹ ¥ŸΩ√ Accept ∞…æÓ¡ÿ¥Ÿ
+			// ÏùºÎã® Îã§Ïãú Accept Í±∏Ïñ¥Ï§ÄÎã§
 			RegisterAccept(acceptEvent);
 		}
 	}
