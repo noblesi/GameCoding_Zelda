@@ -22,5 +22,6 @@ public:
 public:
 	vector<shared_ptr<Actor>> _actors[LAYER_MAXCOUNT];
 	vector<UI*> _uis;
+	vector<shared_ptr<Actor>> _pendingRemoveActors;
 };
 

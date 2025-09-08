@@ -36,13 +36,25 @@ void Scene::Update()
 {
 	float deltaTime = GET_SINGLE(TimeManager)->GetDeltaTime();
 
-	// 복사
-	for (const auto& actors : _actors)
-		for (const shared_ptr<Actor>& actor : actors)
+	for (int layer = 0; layer < LAYER_MAXCOUNT; ++layer)
+	{
+		auto actors = _actors[layer];
+		for (const auto& actor : actors)
 			actor->Tick();
+	}
 
 	for (UI* ui : _uis)
 		ui->Tick();
+
+	if (_pendingRemoveActors.empty() == false)
+	{
+		for (const auto& actor : _pendingRemoveActors)
+		{
+			vector<shared_ptr<Actor>>& v = _actors[actor->GetLayer()];
+			v.erase(std::remove(v.begin(), v.end(), actor), v.end());
+		}
+		_pendingRemoveActors.clear();
+	}
 }
 
 void Scene::Render(HDC hdc)
@@ -74,8 +86,7 @@ void Scene::RemoveActor(shared_ptr<Actor> actor)
 	if (actor == nullptr)
 		return;
 
-	vector<shared_ptr<Actor>>& v = _actors[actor->GetLayer()];
-	v.erase(std::remove(v.begin(), v.end(), actor), v.end());
+	_pendingRemoveActors.push_back(actor);
 }
 
 Creature* Scene::GetCreatureAt(Vec2Int cellPos)
