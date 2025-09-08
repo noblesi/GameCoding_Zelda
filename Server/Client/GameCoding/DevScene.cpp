@@ -105,6 +105,8 @@ void DevScene::RemoveActor(Actor* actor)
 {
 	Super::RemoveActor(actor);
 
+	bool wasMonster = dynamic_cast<Monster*>(actor) != nullptr;
+
 	auto it = remove_if(_ownedActors.begin(), _ownedActors.end(),
 		[actor](const shared_ptr<Actor>& ptr)
 		{
@@ -112,8 +114,8 @@ void DevScene::RemoveActor(Actor* actor)
 		});
 	_ownedActors.erase(it, _ownedActors.end());
 
-	Monster* creature = dynamic_cast<Monster*>(actor);
-	if (creature)
+	
+	if (wasMonster)
 	{
 		_monsterCount--;
 	}

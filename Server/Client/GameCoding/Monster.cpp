@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Monster.h"
 #include "InputManager.h"
 #include "TimeManager.h"
@@ -50,26 +50,31 @@ void Monster::TickIdle()
 	if (scene == nullptr)
 		return;
 
-	return;
-
 	// Find Player
-	if (_target == nullptr)
-		_target = scene->FindClosestPlayer(GetCellPos());
-
-	if (_target)
+	shared_ptr<Player> target = _target.lock();
+	if (target == nullptr)
 	{
-		Vec2Int dir = _target->GetCellPos() - GetCellPos();
+		_target.reset();
+		Player* player = scene->FindClosestPlayer(GetCellPos());
+		if (player)
+			_target = static_pointer_cast<Player>(player->shared_from_this());
+		target = _target.lock();
+	}
+
+	if (target)
+	{
+		Vec2Int dir = target->GetCellPos() - GetCellPos();
 		int32 dist = abs(dir.x) + abs(dir.y);
 		if (dist == 1)
 		{
-			SetDir(GetLookAtDir(_target->GetCellPos()));
+			SetDir(GetLookAtDir(target->GetCellPos()));
 			SetState(SKILL);
-			_waitSeconds = 0.5f; // °ø°Ý Á¾·á ½Ã°£
+			_waitSeconds = 0.5f; // ê³µê²© ì¢…ë£Œ ì‹œê°„
 		}
 		else
 		{
 			vector<Vec2Int> path;
-			if (scene->FindPath(GetCellPos(), _target->GetCellPos(), OUT path))
+			if (scene->FindPath(GetCellPos(), target->GetCellPos(), OUT path))
 			{
 				if (path.size() > 1)
 				{

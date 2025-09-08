@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "FlipbookActor.h"
 
 class GameObject : public FlipbookActor

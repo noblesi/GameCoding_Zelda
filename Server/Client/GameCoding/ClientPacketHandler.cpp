@@ -87,7 +87,7 @@ void ClientPacketHandler::Handle_S_MyPlayer(ServerSessionRef session, BYTE* buff
 	{
 		auto myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
 		myPlayer->info = info;
-		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer.get());
+		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer);
 	}
 }
 
@@ -116,7 +116,19 @@ void ClientPacketHandler::Handle_S_RemoveObject(ServerSessionRef session, BYTE* 
 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
+	{
+		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
+		for (int32 i = 0; i < pkt.ids_size(); i++)
+		{
+			if (pkt.ids(i) == myPlayerId)
+			{
+				GET_SINGLE(SceneManager)->SetMyPlayer(nullptr);
+				break;
+			}
+		}
 		scene->Handle_S_RemoveObject(pkt);
+	}
+		
 }
 
 void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, int32 len)
@@ -151,7 +163,7 @@ SendBufferRef ClientPacketHandler::Make_C_Move()
 {
 	Protocol::C_Move pkt;
 
-	MyPlayer* myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+	shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 
 	*pkt.mutable_info() = myPlayer->info;
 

@@ -30,15 +30,26 @@ void GameRoom::Init()
 
 void GameRoom::Update()
 {
+	vector<uint64> removeIds;
+
 	for (auto& item : _players)
 	{
 		item.second->Update();
+
+		if (item.second->info.hp() <= 0)
+			removeIds.push_back(item.first);
 	}
 
 	for (auto& item : _monsters)
 	{
 		item.second->Update();
+
+		if (item.second->info.hp() <= 0)
+			removeIds.push_back(item.first);
 	}
+
+	for (uint64 id : removeIds)
+		RemoveObject(id);
 }
 
 void GameRoom::EnterRoom(GameSessionRef session)

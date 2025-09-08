@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Creature.h"
 
@@ -30,6 +30,6 @@ private:
 	Flipbook* _flipbookMove[4] = {};
 	float _waitSeconds = 0.f;
 
-	Player* _target = nullptr; // TEMP
+	weak_ptr<Player> _target;
 };
 
