@@ -388,7 +388,7 @@ Player* DevScene::FindClosestPlayer(Vec2Int pos)
 			float dist = dir.LengthSquared();
 			if (dist < best)
 			{
-				dist = best;
+				best = dist;
 				ret = player;
 			}
 		}
