@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Creature.h"
 #include "InputManager.h"
 #include "TimeManager.h"
@@ -52,7 +52,7 @@ void Creature::OnDamaged(Creature* attacker)
 		Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
 		if (scene)
 		{
-			scene->RemoveActor(this);
+			scene->RemoveActor(shared_from_this());
 		}
 	}
 }

@@ -13,11 +13,8 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	for (const vector<Actor*>& actors : _actors)
-		for (Actor* actor : actors)
-			SAFE_DELETE(actor);
-
-	_actors->clear();
+	for (auto& layer : _actors)
+		layer.clear();
 
 	for (UI* ui : _uis)
 		SAFE_DELETE(ui);
@@ -27,8 +24,8 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-	for (const vector<Actor*>& actors : _actors)
-		for (Actor* actor : actors)
+	for (const auto& actors : _actors)
+		for (const shared_ptr<Actor>& actor : actors)
 			actor->BeginPlay();
 
 	for (UI* ui : _uis)
@@ -40,8 +37,8 @@ void Scene::Update()
 	float deltaTime = GET_SINGLE(TimeManager)->GetDeltaTime();
 
 	// 복사
-	for (const vector<Actor*> actors : _actors)
-		for (Actor* actor : actors)
+	for (const auto& actors : _actors)
+		for (const shared_ptr<Actor>& actor : actors)
 			actor->Tick();
 
 	for (UI* ui : _uis)
@@ -50,21 +47,21 @@ void Scene::Update()
 
 void Scene::Render(HDC hdc)
 {
-	vector<Actor*>& actors = _actors[LAYER_OBJECT];
-	std::sort(actors.begin(), actors.end(), [=](Actor* a, Actor* b)
+	vector<shared_ptr<Actor>>& actors = _actors[LAYER_OBJECT];
+	std::sort(actors.begin(), actors.end(), [=](const shared_ptr<Actor>& a, const shared_ptr<Actor>& b)
 	{
 		return a->GetPos().y < b->GetPos().y;
 	});
 
-	for (const vector<Actor*>& actors : _actors)
-		for (Actor* actor : actors)
+	for (const auto& actors : _actors)
+		for (const shared_ptr<Actor> actor : actors)
 			actor->Render(hdc);
 
 	for (UI* ui : _uis)
 		ui->Render(hdc);
 }
 
-void Scene::AddActor(Actor* actor)
+void Scene::AddActor(shared_ptr<Actor> actor)
 {
 	if (actor == nullptr)
 		return;
@@ -72,21 +69,21 @@ void Scene::AddActor(Actor* actor)
 	_actors[actor->GetLayer()].push_back(actor);
 }
 
-void Scene::RemoveActor(Actor* actor)
+void Scene::RemoveActor(shared_ptr<Actor> actor)
 {
 	if (actor == nullptr)
 		return;
 
-	vector<Actor*>& v = _actors[actor->GetLayer()];
+	vector<shared_ptr<Actor>>& v = _actors[actor->GetLayer()];
 	v.erase(std::remove(v.begin(), v.end(), actor), v.end());
 }
 
 Creature* Scene::GetCreatureAt(Vec2Int cellPos)
 {
-	for (Actor* actor : _actors[LAYER_OBJECT])
+	for (const shared_ptr<Actor> actor : _actors[LAYER_OBJECT])
 	{
 		// GameObjectType
-		Creature* creature = dynamic_cast<Creature*>(actor);
+		Creature* creature = dynamic_cast<Creature*>(actor.get());
 		if (creature && creature->GetCellPos() == cellPos)
 			return creature;
 	}

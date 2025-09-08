@@ -149,7 +149,7 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 		if (myPlayerId == info.objectid())
 			return;
 
-		GameObject* gameObject = scene->GetObject(info.objectid());
+		shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
 		if (gameObject)
 		{
 			gameObject->SetDir(info.dir());

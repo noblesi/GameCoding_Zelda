@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Arrow.h"
 #include "TimeManager.h"
 #include "ResourceManager.h"
@@ -64,7 +64,7 @@ void Arrow::TickIdle()
 			//creature->OnDamaged(this);
 		}
 
-		scene->RemoveActor(this);
+		scene->RemoveActor(shared_from_this());
 	}
 }
 

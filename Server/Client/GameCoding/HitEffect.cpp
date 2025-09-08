@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "HitEffect.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
@@ -27,7 +27,7 @@ void HitEffect::Tick()
 	if (IsAnimationEnded())
 	{
 		Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
-		scene->RemoveActor(this);
+		scene->RemoveActor(shared_from_this());
 	}
 }
 

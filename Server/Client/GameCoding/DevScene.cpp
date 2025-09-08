@@ -90,27 +90,27 @@ void DevScene::Render(HDC hdc)
 
 }
 
-void DevScene::AddActor(Actor* actor)
+void DevScene::AddActor(shared_ptr<Actor> actor)
 {
 	Super::AddActor(actor);
 
-	Monster* creature = dynamic_cast<Monster*>(actor);
+	Monster* creature = dynamic_cast<Monster*>(actor.get());
 	if (creature)
 	{
 		_monsterCount++;
 	}
 }
 
-void DevScene::RemoveActor(Actor* actor)
+void DevScene::RemoveActor(shared_ptr<Actor> actor)
 {
 	Super::RemoveActor(actor);
 
-	bool wasMonster = dynamic_cast<Monster*>(actor) != nullptr;
+	bool wasMonster = dynamic_cast<Monster*>(actor.get()) != nullptr;
 
 	auto it = remove_if(_ownedActors.begin(), _ownedActors.end(),
 		[actor](const shared_ptr<Actor>& ptr)
 		{
-			return ptr.get() == actor;
+			return ptr == actor;
 		});
 	_ownedActors.erase(it, _ownedActors.end());
 
@@ -131,7 +131,7 @@ void DevScene::LoadMap()
 	const Vec2Int size = sprite->GetSize();
 	background->SetPos(Vec2(size.x / 2, size.y / 2));
 
-	AddActor(background.get());
+	AddActor(background);
 	_ownedActors.push_back(background);
 }
 
@@ -307,7 +307,7 @@ void DevScene::LoadEffect()
 void DevScene::LoadTilemap()
 {
 	auto actor = make_shared<TilemapActor>();
-	AddActor(actor.get());
+	AddActor(actor);
 
 	_tilemapActor = actor;
 	_ownedActors.push_back(actor);
@@ -358,17 +358,17 @@ void DevScene::Handle_S_RemoveObject(Protocol::S_RemoveObject& pkt)
 	{
 		int32 id = pkt.ids(i);
 
-		GameObject* object = GetObject(id);
+		shared_ptr<GameObject> object = GetObject(id);
 		if (object)
 			RemoveActor(object);
 	}
 }
 
-GameObject* DevScene::GetObject(uint64 id)
+shared_ptr<GameObject> DevScene::GetObject(uint64 id)
 {
-	for (Actor* actor : _actors[LAYER_OBJECT])
+	for (const shared_ptr<Actor> actor : _actors[LAYER_OBJECT])
 	{
-		GameObject* gameObject = dynamic_cast<GameObject*>(actor);
+		shared_ptr<GameObject> gameObject = dynamic_pointer_cast<GameObject>(actor);
 		if (gameObject && gameObject->info.objectid() == id)
 			return gameObject;
 	}
@@ -381,9 +381,9 @@ Player* DevScene::FindClosestPlayer(Vec2Int pos)
 	float best = FLT_MAX;
 	Player* ret = nullptr;
 
-	for (Actor* actor : _actors[LAYER_OBJECT])
+	for (const shared_ptr<Actor>& actor : _actors[LAYER_OBJECT])
 	{
-		Player* player = dynamic_cast<Player*>(actor);
+		Player* player = dynamic_cast<Player*>(actor.get());
 		if (player)
 		{
 			Vec2Int dir = pos - player->GetCellPos();
