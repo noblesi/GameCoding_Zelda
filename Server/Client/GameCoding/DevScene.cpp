@@ -337,16 +337,22 @@ void DevScene::Handle_S_AddObject(Protocol::S_AddObject& pkt)
 		if (info.objecttype() == Protocol::OBJECT_TYPE_PLAYER)
 		{
 			auto player = SpawnObject<Player>(Vec2Int{info.posx(), info.posy()});
+
 			player->SetDir(info.dir());
 			player->SetState(info.state());
 			player->info = info;
+
+			cout << "[DevScene] Spawned object ID : " << info.objectid() << endl;
 		}
 		else if (info.objecttype() == Protocol::OBJECT_TYPE_MONSTER)
 		{
 			auto monster = SpawnObject<Monster>(Vec2Int{ info.posx(), info.posy() });
+
 			monster->SetDir(info.dir());
 			monster->SetState(info.state());
 			monster->info = info;
+
+			cout << "[DevScene] Spawned object ID : " << info.objectid() << endl;
 		}
 	}
 }

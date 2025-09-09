@@ -100,6 +100,12 @@ void ClientPacketHandler::Handle_S_AddObject(ServerSessionRef session, BYTE* buf
 	Protocol::S_AddObject pkt;
 	pkt.ParseFromArray(&header[1], size - sizeof(PacketHeader));
 
+	for (int32 i = 0; i < pkt.objects_size(); i++)
+	{
+		const Protocol::ObjectInfo& info = pkt.objects(i);
+		cout << "[Client] Received object ID : " << info.objectid() << endl;
+	}
+
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
 		scene->Handle_S_AddObject(pkt);

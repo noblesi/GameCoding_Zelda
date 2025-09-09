@@ -70,12 +70,17 @@ void GameRoom::EnterRoom(GameSessionRef session)
 		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_MyPlayer(player->info);
 		session->Send(sendBuffer);
 	}
+
+	AddObject(player);
+
 	// 모든 오브젝트 정보 전송
 	{
 		Protocol::S_AddObject pkt;
 
 		for (auto& item : _players)
 		{
+			if (item.first == player->info.objectid())
+				continue;
 			Protocol::ObjectInfo* info = pkt.add_objects();
 			*info = item.second->info;
 		}
@@ -90,7 +95,7 @@ void GameRoom::EnterRoom(GameSessionRef session)
 		session->Send(sendBuffer);
 	}
 
-	AddObject(player);
+	
 }
 
 void GameRoom::LeaveRoom(GameSessionRef session)
