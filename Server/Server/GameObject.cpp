@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "GameObject.h"
 #include "Player.h"
 #include "Monster.h"
@@ -35,6 +35,7 @@ void GameObject::SetState(ObjectState state, bool broadcast)
 		return;
 
 	info.set_state(state);
+	cout << "Object " << info.objectid() << " state changed to " << state << endl;
 
 	if (broadcast)
 		BroadcastMove();
