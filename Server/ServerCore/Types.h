@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 #include <mutex>
+#include <shared_mutex>
 #include <atomic>
 
 using int8 = __int8;
@@ -13,10 +14,11 @@ using uint64 = unsigned __int64;
 
 template<typename T>
 using Atomic = std::atomic<T>;
-using Mutex = std::mutex;
+using Mutex = std::shared_mutex;
 using CondVar = std::condition_variable;
-using UniqueLock = std::unique_lock<std::mutex>;
-using LockGuard = std::lock_guard<std::mutex>;
+using UniqueLock = std::unique_lock<Mutex>;
+using LockGuard = std::lock_guard<Mutex>;
+using ReadLockGuard = std::shared_lock<Mutex>;
 
 // shared_ptr
 using IocpCoreRef = std::shared_ptr<class IocpCore>;

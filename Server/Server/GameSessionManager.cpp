@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "GameSessionManager.h"
 #include "GameSession.h"
 
@@ -18,7 +18,7 @@ void GameSessionManager::Remove(GameSessionRef session)
 
 void GameSessionManager::Broadcast(SendBufferRef sendBuffer)
 {
-	WRITE_LOCK;
+	READ_LOCK;
 	for (GameSessionRef session : _sessions)
 	{
 		session->Send(sendBuffer);
