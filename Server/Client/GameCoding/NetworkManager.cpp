@@ -4,6 +4,7 @@
 #include "ThreadManager.h"
 #include "ServerSession.h"
 #include <thread>
+#include "Logger.h"
 
 void NetworkManager::Init()
 {
@@ -21,19 +22,19 @@ void NetworkManager::Init()
 	{
 		if (_service->Start())
 		{
-			cout << "[NetworkManager] Connected to server" << endl;
+			Logger::Info("[NetworkManager] Connected to server");
 			_connected = true;
 			started = true;
 			break;
 		}
 
-		cout << "[NetworkManager] Start failed. retry " << i + 1 << "/" << maxRetry << endl;
+		Logger::Warn("[NetworkManager] Start failed. retry " + std::to_string(i + 1) + "/" + std::to_string(maxRetry));
 
 		this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 
 	if (started == false)
-		cout << "[NetworkManager] Failed to connect to server" << endl;
+		Logger::Error("[NetworkManager] Failed to connect to server");
 }
 
 void NetworkManager::Update()
@@ -47,13 +48,13 @@ void NetworkManager::Update()
 	{
 		if (_service->Start())
 		{
-			cout << "[NetworkManager] Reconnected to server" << endl;
+			Logger::Info("[NetworkManager] Reconnected to server");
 			_reconnectRequested = false;
 			_connected = true;
 		}
 		else
 		{
-			cout << "[NetworkManager] Reconnect attempt failed" << endl;
+			Logger::Warn("[NetworkManager] Reconnect attempt failed");
 		}
 	}
 }

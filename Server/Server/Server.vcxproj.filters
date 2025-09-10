@@ -27,6 +27,9 @@
     <Filter Include="소스 파일\Game\Room">
       <UniqueIdentifier>{0c4f1e66-e8f1-4f8c-b038-ba2cde77ab92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Common">
+      <UniqueIdentifier>{075dfeba-0651-40aa-a974-5be09e42b055}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

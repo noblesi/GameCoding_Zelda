@@ -4,6 +4,7 @@
 #include "IocpEvent.h"
 #include "Session.h"
 #include "Service.h"
+#include "Logger.h"
 
 /*--------------
 	Listener
@@ -104,7 +105,7 @@ void Listener::ProcessAccept(IocpEvent* acceptEvent)
 		return;
 	}
 
-	cout << "Client Connected!" << endl;
+	Logger::Info("Client Connected!");
 
 	session->SetNetAddress(NetAddress(sockAddress));
 	session->ProcessConnect();

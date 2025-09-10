@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-#include <iostream>
 #include <thread>
 #include <vector>
 using namespace std;
@@ -16,6 +15,7 @@ using namespace std;
 #include <csignal>
 #include <chrono>
 #include "Shutdown.h"
+#include "Logger.h"
 
 static atomic<bool> gIsRunning(true); // 서버 루프 실행 여부 플래그
 
@@ -27,6 +27,9 @@ static void SignaleHandler(int) { RequestShutdown(); }
 
 int main()
 {
+	Logger::Init("server.log");
+	Logger::Info("Server starting");
+
 	SocketUtils::Init();
 	GRoom->Init();
 
@@ -61,5 +64,6 @@ int main()
 	
 	// 윈속 종료
 	SocketUtils::Clear();
+	Logger::Info("Server shutting down");
 	return 0;
 }
