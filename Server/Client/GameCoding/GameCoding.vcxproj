@@ -147,7 +147,6 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Arrow.h" />
-    <ClInclude Include="Button.h" />
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="ClientPacketHandler.h" />
     <ClInclude Include="Component.h" />
@@ -169,7 +168,6 @@
     <ClInclude Include="MyPlayer.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="Panel.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
@@ -191,14 +189,12 @@
     <ClInclude Include="TilemapActor.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="UI.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Values.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Arrow.cpp" />
-    <ClCompile Include="Button.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="ClientPacketHandler.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -220,7 +216,6 @@
     <ClCompile Include="MyPlayer.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="Panel.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -248,7 +243,6 @@
     <ClCompile Include="Tilemap.cpp" />
     <ClCompile Include="TilemapActor.cpp" />
     <ClCompile Include="TimeManager.cpp" />
-    <ClCompile Include="UI.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -152,15 +152,6 @@
     <ClInclude Include="CameraComponent.h">
       <Filter>소스 파일\05. Component\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="UI.h">
-      <Filter>소스 파일\06. UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>소스 파일\06. UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Panel.h">
-      <Filter>소스 파일\06. UI</Filter>
-    </ClInclude>
     <ClInclude Include="TilemapActor.h">
       <Filter>소스 파일\03. Objects\Unreal</Filter>
     </ClInclude>
@@ -292,15 +283,6 @@
     </ClCompile>
     <ClCompile Include="CameraComponent.cpp">
       <Filter>소스 파일\05. Component\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="UI.cpp">
-      <Filter>소스 파일\06. UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Button.cpp">
-      <Filter>소스 파일\06. UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Panel.cpp">
-      <Filter>소스 파일\06. UI</Filter>
     </ClCompile>
     <ClCompile Include="TilemapActor.cpp">
       <Filter>소스 파일\03. Objects\Unreal</Filter>
