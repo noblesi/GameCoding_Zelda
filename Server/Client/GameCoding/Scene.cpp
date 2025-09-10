@@ -2,7 +2,6 @@
 #include "Scene.h"
 #include "Actor.h"
 #include "Creature.h"
-#include "UI.h"
 #include "TimeManager.h"
 #include "SceneManager.h"
 
@@ -15,11 +14,6 @@ Scene::~Scene()
 {
 	for (auto& layer : _actors)
 		layer.clear();
-
-	for (UI* ui : _uis)
-		SAFE_DELETE(ui);
-
-	_uis.clear();
 }
 
 void Scene::Init()
@@ -27,9 +21,6 @@ void Scene::Init()
 	for (const auto& actors : _actors)
 		for (const shared_ptr<Actor>& actor : actors)
 			actor->BeginPlay();
-
-	for (UI* ui : _uis)
-		ui->BeginPlay();
 }
 
 void Scene::Update()
@@ -42,9 +33,6 @@ void Scene::Update()
 		for (const auto& actor : actors)
 			actor->Tick();
 	}
-
-	for (UI* ui : _uis)
-		ui->Tick();
 
 	if (_pendingRemoveActors.empty() == false)
 	{
@@ -68,9 +56,6 @@ void Scene::Render(HDC hdc)
 	for (const auto& actors : _actors)
 		for (const shared_ptr<Actor> actor : actors)
 			actor->Render(hdc);
-
-	for (UI* ui : _uis)
-		ui->Render(hdc);
 }
 
 void Scene::AddActor(shared_ptr<Actor> actor)

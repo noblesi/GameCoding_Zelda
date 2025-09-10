@@ -6,7 +6,6 @@ class Actor;
 class Creature; 
 class Player;
 class GameObject;
-class UI;
 
 struct PQNode
 {
