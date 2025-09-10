@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "NetAddress.h"
 #include "IocpCore.h"
 #include "Listener.h"
@@ -71,6 +71,7 @@ public:
 
 class ServerService : public Service
 {
+	friend class Service;
 public:
 	ServerService(NetAddress targetAddress, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
 	virtual ~ServerService() {}

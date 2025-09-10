@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Service.h"
 #include "Session.h"
 #include "Listener.h"
@@ -19,7 +19,22 @@ Service::~Service()
 
 void Service::CloseService()
 {
-	// TODO
+	vector<SessionRef> sessions;
+	{
+		WRITE_LOCK;
+		sessions.assign(_sessions.begin(), _sessions.end());
+	}
+
+	for (SessionRef session : sessions)
+		session->Disconnect(L"Service Closed");
+
+	if (_type == ServiceType::Server)
+	{
+		ServerService* serverService = static_cast<ServerService*>(this);
+		serverService->_listener = nullptr;
+	}
+
+	_iocpCore = nullptr;
 }
 
 SessionRef Service::CreateSession()
@@ -95,7 +110,8 @@ bool ServerService::Start()
 
 void ServerService::CloseService()
 {
-	// TODO
+	if (_listener)
+		_listener->CloseSocket();
 
 	Service::CloseService();
 }
