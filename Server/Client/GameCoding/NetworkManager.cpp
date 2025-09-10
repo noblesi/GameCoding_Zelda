@@ -10,11 +10,7 @@ void NetworkManager::Init()
 {
 	SocketUtils::Init();
 
-	_service = make_shared<ClientService>(
-		NetAddress(L"127.0.0.1", 7777),
-		make_shared<IocpCore>(),
-		[=]() { return CreateSession(); }, // TODO : SessionManager 등
-		1);
+	SetServerInfo(L"127.0.0.1", 7777);
 
 	const int32 maxRetry = 5;
 	bool started = false;
@@ -57,6 +53,17 @@ void NetworkManager::Update()
 			Logger::Warn("[NetworkManager] Reconnect attempt failed");
 		}
 	}
+}
+
+void NetworkManager::SetServerInfo(const wstring& ip, uint16 port)
+{
+	_ip = ip;
+	_port = port;
+	_service = make_shared<ClientService>(
+		NetAddress(ip, port),
+		make_shared<IocpCore>(),
+		[=]() { return CreateSession(); },
+		1);
 }
 
 ServerSessionRef NetworkManager::CreateSession()
