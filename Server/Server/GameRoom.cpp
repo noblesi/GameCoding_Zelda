@@ -199,7 +199,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	gameObject->info.set_posy(targetPos.y); // 서버에 최종 좌표 저장
 
 	{
-		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
+		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
 		Broadcast(sendBuffer);
 	}
 }

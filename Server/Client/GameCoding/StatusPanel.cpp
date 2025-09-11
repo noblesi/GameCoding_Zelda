@@ -7,12 +7,12 @@
 
 StatusPanel::StatusPanel(NetworkManager* networkManager) : _networkManager(networkManager)
 {
-    Button* ui = new Button();
+    auto ui = make_unique<Button>();
     ui->SetSprite(GET_SINGLE(ResourceManager)->GetSprite(L"Start_Off"), BS_Default);
     ui->SetSprite(GET_SINGLE(ResourceManager)->GetSprite(L"Start_On"), BS_Clicked);
     ui->SetPos({ 800, 200 });
     ui->AddOnClickDelegate(this, &StatusPanel::OnClickReconnectButton);
-    AddChild(ui);
+    AddChild(move(ui));
 }
 
 StatusPanel::~StatusPanel()

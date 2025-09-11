@@ -153,14 +153,30 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 	{
 		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
 		if (myPlayerId == info.objectid())
-			return;
-
-		shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
-		if (gameObject)
 		{
-			gameObject->SetDir(info.dir());
-			gameObject->SetState(info.state());
-			gameObject->SetCellPos(Vec2Int{info.posx(), info.posy()});
+			shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+			if (myPlayer)
+			{
+				myPlayer->SetDir(info.dir());
+				myPlayer->SetState(info.state());
+
+				Vec2Int curPos = myPlayer->GetCellPos();
+				Vec2Int serverPos{ info.posx(), info.posy() };
+				Vec2Int delta = serverPos - curPos;
+				const int32 threshold = 1;
+				if (delta.LengthSquared() > threshold * threshold)
+					myPlayer->SetCellPos(serverPos, true);
+			}
+		}
+		else
+		{
+			shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
+			if (gameObject)
+			{
+				gameObject->SetDir(info.dir());
+				gameObject->SetState(info.state());
+				gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });
+			}
 		}
 	}
 }

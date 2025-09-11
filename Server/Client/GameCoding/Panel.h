@@ -13,7 +13,7 @@ public:
     virtual void Tick() override;
     virtual void Render(HDC hdc) override;
 
-    void AddChild(Actor* child);
+    void AddChild(unique_ptr<Actor> child);
 
 protected:
     vector<unique_ptr<Actor>> _children;
