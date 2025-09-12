@@ -30,6 +30,8 @@ void GameRoom::Init()
 
 void GameRoom::Update()
 {
+	ProcessMoveRequests();
+
 	vector<uint64> removeIds;
 
 	for (auto& item : _players)
@@ -136,6 +138,10 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	if (player == nullptr)
 		return;
 
+	if (pkt.seq() <= player->lastMoveSeq)
+		return;
+	player->lastMoveSeq = pkt.seq();
+
 	Vec2Int curPos = gameObject->GetCellPos();
 	Vec2Int targetPos{ pkt.info().posx(), pkt.info().posy() };
 	Vec2Int delta = targetPos - curPos; // 목표 지점과 현재 위치의 차이 계산
@@ -143,7 +149,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	auto sendCorrection = [&]()
 		{
 			// 서버기준 위치로 수정 패킷 전송
-			SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
+			SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info, player->lastMoveSeq);
 
 			if (player->session)
 				player->session->Send(sendBuffer);
@@ -152,7 +158,48 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	bool invalid = false; // 검증 실패 여부
 
 	if (delta.LengthSquared() > 1)
-		invalid = true; // 한번에 두 칸이상 이동하면 무효
+	{
+		// delta 방향을 따라 한 칸씩 이동 가능 여부 확인
+		if (delta.x != 0 && delta.y != 0)
+		{
+			// 대각선 이동은 허용하지 않음
+			invalid = true;
+		}
+		else
+		{
+			Vec2Int stepDir
+			{
+					(delta.x > 0) ? 1 : (delta.x < 0 ? -1 : 0),
+					(delta.y > 0) ? 1 : (delta.y < 0 ? -1 : 0)
+			};
+
+			int32 steps = abs(delta.x) + abs(delta.y);
+			Vec2Int nextPos = curPos;
+			for (int32 i = 0; i < steps; ++i)
+			{
+				nextPos += stepDir;
+				if (CanGo(nextPos) == false)
+				{
+					invalid = true;
+					break;
+				}
+			}
+
+			if (invalid == false)
+			{
+				targetPos = nextPos;
+
+				Dir expectedDir = DIR_UP;
+				if (stepDir.x == 1 && stepDir.y == 0) expectedDir = DIR_RIGHT;
+				else if (stepDir.x == -1 && stepDir.y == 0) expectedDir = DIR_LEFT;
+				else if (stepDir.x == 0 && stepDir.y == 1) expectedDir = DIR_DOWN;
+				else if (stepDir.x == 0 && stepDir.y == -1) expectedDir = DIR_UP;
+
+				if (pkt.info().dir() != expectedDir)
+					invalid = true;
+			}
+		}
+	}
 
 	if (pkt.info().state() == MOVE && delta.LengthSquared() == 0)
 		invalid = true; // 이동상태인데 좌표변화가 없으면 무효
@@ -170,7 +217,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 			invalid = true; // 방향 불일치
 	}
 
-	if (CanGo(targetPos) == false)
+	if (delta.LengthSquared() != 0 && CanGo(targetPos, id) == false)
 		invalid = true; // 벽 또는 다른 오브젝트와 충돌
 
 	if (invalid)
@@ -191,17 +238,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 		return;
 	}
 
-	player->invalidMoveCount = 0;
-
-	gameObject->info.set_state(pkt.info().state());
-	gameObject->info.set_dir(pkt.info().dir());
-	gameObject->info.set_posx(targetPos.x);
-	gameObject->info.set_posy(targetPos.y); // 서버에 최종 좌표 저장
-
-	{
-		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
-		Broadcast(sendBuffer);
-	}
+	_moveRequests.push_back({ player, id, targetPos, pkt.info().state(), pkt.info().dir() });
 }
 
 void GameRoom::AddObject(GameObjectRef gameObject)
@@ -414,14 +451,14 @@ bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 
 	return true;
 }
 
-bool GameRoom::CanGo(Vec2Int cellPos)
+bool GameRoom::CanGo(Vec2Int cellPos, uint64 ignoreId)
 {
 	auto tile = _tilemap.GetTileAt(cellPos);
 	if (tile.has_value() == false)
 		return false;
 
 	// 몬스터 충돌?
-	if (GetGameObjectAt(cellPos) != nullptr)
+	if (GetGameObjectAt(cellPos, ignoreId) != nullptr)
 		return false;
 
 	return tile->get().value != 1;
@@ -445,19 +482,100 @@ Vec2Int GameRoom::GetRandomEmptyCellPos()
 	}
 }
 
-GameObjectRef GameRoom::GetGameObjectAt(Vec2Int cellPos)
+GameObjectRef GameRoom::GetGameObjectAt(Vec2Int cellPos, uint64 ignoreId)
 {
 	for (auto& item : _players)
 	{
+		if (item.first == ignoreId)
+			continue;
 		if (item.second->GetCellPos() == cellPos)
 			return item.second;
 	}
 
 	for (auto& item : _monsters)
 	{
+		if (item.first == ignoreId)
+			continue;
 		if (item.second->GetCellPos() == cellPos)
 			return item.second;
 	}
 
 	return nullptr;
+}
+
+void GameRoom::ProcessMoveRequests()
+{
+	if (_moveRequests.empty())
+		return;
+
+	set<uint64> movingIds;
+	map<Vec2Int, int32> destCounts;
+
+	for (auto& req : _moveRequests)
+	{
+		movingIds.insert(req.id);
+		destCounts[req.targetPos]++;
+	}
+
+	vector<MoveRequest> valid;
+
+	for (auto& req : _moveRequests)
+	{
+		PlayerRef player = req.player;
+		if (player == nullptr)
+			continue;
+
+		bool invalid = false;
+
+		auto tile = _tilemap.GetTileAt(req.targetPos);
+		if (tile.has_value() == false || tile->get().value == 1)
+			invalid = true;
+
+		GameObjectRef occupant = GetGameObjectAt(req.targetPos);
+		if (occupant)
+		{
+			uint64 occId = occupant->info.objectid();
+			if (movingIds.find(occId) == movingIds.end())
+				invalid = true;
+		}
+
+		if (destCounts[req.targetPos] > 1)
+			invalid = true;
+
+		if (invalid)
+		{
+			cout << "Invalid move packet from object" << req.id << endl;
+			player->invalidMoveCount++;
+			if (player->invalidMoveCount >= 5)
+			{
+				if (player->session)
+					player->session->Disconnect(L"Invalid Move Packet");
+			}
+			else
+			{
+				SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(player->info);
+				if (player->session)
+					player->session->Send(sendBuffer);
+			}
+		}
+		else
+		{
+			player->invalidMoveCount = 0;
+			valid.push_back(req);
+		}
+	}
+
+	for (auto& req : valid)
+	{
+		PlayerRef player = req.player;
+		player->info.set_state(req.state);
+		player->info.set_dir(req.dir);
+		player->info.set_posx(req.targetPos.x);
+		player->info.set_posy(req.targetPos.y);
+
+		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(player->info);
+		Broadcast(sendBuffer);
+	}
+
+	_moveRequests.clear();
 }

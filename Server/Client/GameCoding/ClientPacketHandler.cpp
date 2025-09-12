@@ -145,8 +145,17 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 
 	Protocol::S_Move pkt;
 	pkt.ParseFromArray(&header[1], size - sizeof(PacketHeader));
-	//
+	
 	const Protocol::ObjectInfo& info = pkt.info();
+
+	uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
+	if (info.objectid() == myPlayerId)
+	{
+		static int32 s_lastSeq = 0;
+		if (pkt.seq() <= s_lastSeq)
+			return;
+		s_lastSeq = pkt.seq();
+	}
 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
@@ -183,11 +192,13 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 
 SendBufferRef ClientPacketHandler::Make_C_Move()
 {
+	static int32 s_seq = 0;
 	Protocol::C_Move pkt;
 
 	shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 
 	*pkt.mutable_info() = myPlayer->info;
+	pkt.set_seq(++s_seq);
 
 	return MakeSendBuffer(pkt, C_Move);
 }

@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "ServerPacketHandler.h"
 #include "BufferReader.h"
 #include "BufferWriter.h"
@@ -36,7 +36,7 @@ void ServerPacketHandler::Handle_C_Move(GameSessionRef session, BYTE* buffer, in
 	if (room)
 		room->Handle_C_Move(pkt);
 
-	// ∑Œ±◊ ¬Ô±‚
+	// Î°úÍ∑∏ Ï∞çÍ∏∞
 }
 
 SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 attack, vector<BuffData> buffs)
@@ -97,12 +97,13 @@ SendBufferRef ServerPacketHandler::Make_S_RemoveObject(const Protocol::S_RemoveO
 	return MakeSendBuffer(pkt, S_RemoveObject);
 }
 
-SendBufferRef ServerPacketHandler::Make_S_Move(const Protocol::ObjectInfo& info)
+SendBufferRef ServerPacketHandler::Make_S_Move(const Protocol::ObjectInfo& info, int32 seq)
 {
 	Protocol::S_Move pkt;
 
 	Protocol::ObjectInfo* objectInfo = pkt.mutable_info();
 	*objectInfo = info;
+	pkt.set_seq(seq);
 
 	return MakeSendBuffer(pkt, S_Move);
 }

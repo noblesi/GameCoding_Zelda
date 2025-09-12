@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Tilemap.h"
 
 struct PQNode
@@ -38,11 +38,24 @@ public:
 public:
 	PlayerRef FindClosestPlayer(Vec2Int pos);
 	bool FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth = 10);
-	bool CanGo(Vec2Int cellPos);
+	bool CanGo(Vec2Int cellPos, uint64 ignoreId = 0);
 	Vec2Int GetRandomEmptyCellPos();
-	GameObjectRef GetGameObjectAt(Vec2Int cellPos);
+	GameObjectRef GetGameObjectAt(Vec2Int cellPos, uint64 ignoreId = 0);
 
 private:
+	void ProcessMoveRequests();
+
+	struct MoveRequest
+	{
+		PlayerRef player;
+		uint64 id;
+		Vec2Int targetPos;
+		ObjectState state;
+		Dir dir;
+	};
+
+	vector<MoveRequest> _moveRequests;
+
 	map<uint64, PlayerRef> _players;
 	map<uint64, MonsterRef> _monsters;
 	Tilemap _tilemap;

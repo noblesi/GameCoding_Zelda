@@ -1029,6 +1029,7 @@ class C_Move final :
 
   enum : int {
     kInfoFieldNumber = 1,
+    kSeqFieldNumber = 2,
   };
   // .Protocol.ObjectInfo info = 1;
   bool has_info() const;
@@ -1048,6 +1049,15 @@ class C_Move final :
       ::Protocol::ObjectInfo* info);
   ::Protocol::ObjectInfo* unsafe_arena_release_info();
 
+  // int32 seq = 2;
+  void clear_seq();
+  int32_t seq() const;
+  void set_seq(int32_t value);
+  private:
+  int32_t _internal_seq() const;
+  void _internal_set_seq(int32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.C_Move)
  private:
   class _Internal;
@@ -1057,6 +1067,7 @@ class C_Move final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::Protocol::ObjectInfo* info_;
+    int32_t seq_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1186,6 +1197,7 @@ class S_Move final :
 
   enum : int {
     kInfoFieldNumber = 1,
+    kSeqFieldNumber = 2,
   };
   // .Protocol.ObjectInfo info = 1;
   bool has_info() const;
@@ -1205,6 +1217,15 @@ class S_Move final :
       ::Protocol::ObjectInfo* info);
   ::Protocol::ObjectInfo* unsafe_arena_release_info();
 
+  // int32 seq = 2;
+  void clear_seq();
+  int32_t seq() const;
+  void set_seq(int32_t value);
+  private:
+  int32_t _internal_seq() const;
+  void _internal_set_seq(int32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.S_Move)
  private:
   class _Internal;
@@ -1214,6 +1235,7 @@ class S_Move final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::Protocol::ObjectInfo* info_;
+    int32_t seq_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1641,6 +1663,26 @@ inline void C_Move::set_allocated_info(::Protocol::ObjectInfo* info) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.C_Move.info)
 }
 
+// int32 seq = 2;
+inline void C_Move::clear_seq() {
+  _impl_.seq_ = 0;
+}
+inline int32_t C_Move::_internal_seq() const {
+  return _impl_.seq_;
+}
+inline int32_t C_Move::seq() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_Move.seq)
+  return _internal_seq();
+}
+inline void C_Move::_internal_set_seq(int32_t value) {
+  
+  _impl_.seq_ = value;
+}
+inline void C_Move::set_seq(int32_t value) {
+  _internal_set_seq(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_Move.seq)
+}
+
 // -------------------------------------------------------------------
 
 // S_Move
@@ -1728,6 +1770,26 @@ inline void S_Move::set_allocated_info(::Protocol::ObjectInfo* info) {
   }
   _impl_.info_ = info;
   // @@protoc_insertion_point(field_set_allocated:Protocol.S_Move.info)
+}
+
+// int32 seq = 2;
+inline void S_Move::clear_seq() {
+  _impl_.seq_ = 0;
+}
+inline int32_t S_Move::_internal_seq() const {
+  return _impl_.seq_;
+}
+inline int32_t S_Move::seq() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_Move.seq)
+  return _internal_seq();
+}
+inline void S_Move::_internal_set_seq(int32_t value) {
+  
+  _impl_.seq_ = value;
+}
+inline void S_Move::set_seq(int32_t value) {
+  _internal_set_seq(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_Move.seq)
 }
 
 #ifdef __GNUC__
