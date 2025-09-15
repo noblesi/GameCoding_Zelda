@@ -103,7 +103,7 @@ void ClientPacketHandler::Handle_S_AddObject(ServerSessionRef session, BYTE* buf
 	for (int32 i = 0; i < pkt.objects_size(); i++)
 	{
 		const Protocol::ObjectInfo& info = pkt.objects(i);
-		cout << "[Client] Received object ID : " << info.objectid() << endl;
+		std::cout << "[Client] Received object ID : " << info.objectid() << std::endl;
 	}
 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
@@ -163,7 +163,7 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
 		if (myPlayerId == info.objectid())
 		{
-			shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+			std::shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 			if (myPlayer)
 			{
 				myPlayer->SetDir(info.dir());
@@ -179,7 +179,7 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 		}
 		else
 		{
-			shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
+			std::shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
 			if (gameObject)
 			{
 				gameObject->SetDir(info.dir());
@@ -195,7 +195,7 @@ SendBufferRef ClientPacketHandler::Make_C_Move()
 	static int32 s_seq = 0;
 	Protocol::C_Move pkt;
 
-	shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+	std::shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 
 	*pkt.mutable_info() = myPlayer->info;
 	pkt.set_seq(++s_seq);

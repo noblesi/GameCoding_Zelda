@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 enum
 {
@@ -18,7 +18,7 @@ class ClientPacketHandler
 public:
 	static void HandlePacket(ServerSessionRef session, BYTE* buffer, int32 len);
 
-	// ¹Þ±â
+	// ë°›ê¸°
 	static void Handle_S_TEST(ServerSessionRef session, BYTE* buffer, int32 len);
 	static void Handle_S_EnterGame(ServerSessionRef session, BYTE* buffer, int32 len);
 	static void Handle_S_MyPlayer(ServerSessionRef session, BYTE* buffer, int32 len);
@@ -26,7 +26,7 @@ public:
 	static void Handle_S_RemoveObject(ServerSessionRef session, BYTE* buffer, int32 len);
 	static void Handle_S_Move(ServerSessionRef session, BYTE* buffer, int32 len);
 
-	// º¸³»±â
+	// ë³´ë‚´ê¸°
 	static SendBufferRef Make_C_Move();
 
 	template<typename T>
@@ -35,7 +35,7 @@ public:
 		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
 		const uint16 packetSize = dataSize + sizeof(PacketHeader);
 
-		SendBufferRef sendBuffer = make_shared<SendBuffer>(packetSize);
+		SendBufferRef sendBuffer = std::make_shared<SendBuffer>(packetSize);
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(sendBuffer->Buffer());
 		header->size = packetSize;
 		header->id = pktId;

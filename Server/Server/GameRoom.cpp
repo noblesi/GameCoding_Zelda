@@ -5,7 +5,7 @@
 #include "GameSession.h"
 #include <filesystem>
 
-GameRoomRef GRoom = make_shared<GameRoom>();
+GameRoomRef GRoom = std::make_shared<GameRoom>();
 
 GameRoom::GameRoom()
 {
@@ -32,7 +32,7 @@ void GameRoom::Update()
 {
 	ProcessMoveRequests();
 
-	vector<uint64> removeIds;
+	std::vector<uint64> removeIds;
 
 	for (auto& item : _players)
 	{
@@ -222,7 +222,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 
 	if (invalid)
 	{
-		cout << "Invalid move packet from object" << id << endl; // 서버 로그 출력
+		std::cout << "Invalid move packet from object" << id << std::endl; // 서버 로그 출력
 		player->invalidMoveCount++;
 		if (player->invalidMoveCount >= 5)
 		{
@@ -334,15 +334,15 @@ PlayerRef GameRoom::FindClosestPlayer(Vec2Int pos)
 	return ret;
 }
 
-bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth /*= 10*/)
+bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, int32 maxDepth /*= 10*/)
 {
 	int32 depth = abs(src.y - dest.y) + abs(src.x - dest.x);
 	if (depth >= maxDepth)
 		return false;
 
-	priority_queue<PQNode, vector<PQNode>, greater<PQNode>> pq;
-	map<Vec2Int, int32> best;
-	map<Vec2Int, Vec2Int> parent;
+	std::priority_queue<PQNode, std::vector<PQNode>, std::greater<PQNode>> pq;
+	std::map<Vec2Int, int32> best;
+	std::map<Vec2Int, Vec2Int> parent;
 
 	// 초기값
 	{
@@ -508,8 +508,8 @@ void GameRoom::ProcessMoveRequests()
 	if (_moveRequests.empty())
 		return;
 
-	set<uint64> movingIds;
-	map<Vec2Int, int32> destCounts;
+	std::set<uint64> movingIds;
+	std::map<Vec2Int, int32> destCounts;
 
 	for (auto& req : _moveRequests)
 	{
@@ -517,7 +517,7 @@ void GameRoom::ProcessMoveRequests()
 		destCounts[req.targetPos]++;
 	}
 
-	vector<MoveRequest> valid;
+	std::vector<MoveRequest> valid;
 
 	for (auto& req : _moveRequests)
 	{
@@ -544,7 +544,7 @@ void GameRoom::ProcessMoveRequests()
 
 		if (invalid)
 		{
-			cout << "Invalid move packet from object" << req.id << endl;
+			std::cout << "Invalid move packet from object" << req.id << std::endl;
 			player->invalidMoveCount++;
 			if (player->invalidMoveCount >= 5)
 			{

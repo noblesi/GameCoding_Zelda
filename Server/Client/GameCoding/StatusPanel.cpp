@@ -7,7 +7,7 @@
 
 StatusPanel::StatusPanel(NetworkManager* networkManager) : _networkManager(networkManager)
 {
-    auto ui = make_unique<Button>();
+    auto ui = std::make_unique<Button>();
     ui->SetSprite(GET_SINGLE(ResourceManager)->GetSprite(L"Start_Off"), BS_Default);
     ui->SetSprite(GET_SINGLE(ResourceManager)->GetSprite(L"Start_On"), BS_Clicked);
     ui->SetPos({ 800, 200 });
@@ -50,7 +50,7 @@ void StatusPanel::Tick()
         }
     }
 
-    auto captureText = [](wstring& text, bool allowDot)
+    auto captureText = [](std::wstring& text, bool allowDot)
         {
             if ((GetAsyncKeyState(VK_BACK) & 0x0001) && !text.empty())
                 text.pop_back();
@@ -75,7 +75,7 @@ void StatusPanel::Render(HDC hdc)
 {
     Super::Render(hdc);
 
-    wstring status = L"Disconnected";
+    std::wstring status = L"Disconnected";
     if (_networkManager && _networkManager->IsConnected())
         status = L"Connected";
     Utils::DrawTextW(hdc, { 100, 50 }, std::format(L"Status : {0}", status));

@@ -30,20 +30,20 @@ void ResourceManager::Clear()
 	_sounds.clear();
 }
 
-Texture* ResourceManager::GetTexture(const wstring& key)
+Texture* ResourceManager::GetTexture(const std::wstring& key)
 {
 	auto it = _textures.find(key);
 	return it != _textures.end() ? it->second.get() : nullptr;
 }
 
-Texture* ResourceManager::LoadTexture(const wstring& key, const wstring& path, uint32 transparent /*= RGB(255, 0, 255)*/)
+Texture* ResourceManager::LoadTexture(const std::wstring& key, const std::wstring& path, uint32 transparent /*= RGB(255, 0, 255)*/)
 {
 	if (_textures.find(key) != _textures.end())
 		return _textures[key].get();
 
 	fs::path fullPath = _resourcePath / path;
 
-	auto texture = make_unique<Texture>();
+	auto texture = std::make_unique<Texture>();
 	texture->LoadBmp(_hwnd, fullPath.c_str());
 	texture->SetTransparent(transparent);
 	Texture* ptr = texture.get();
@@ -52,13 +52,13 @@ Texture* ResourceManager::LoadTexture(const wstring& key, const wstring& path, u
 	return ptr;
 }
 
-Sprite* ResourceManager::GetSprite(const wstring& key)
+Sprite* ResourceManager::GetSprite(const std::wstring& key)
 {
 	auto it = _sprites.find(key);
 	return it != _sprites.end() ? it->second.get() : nullptr;
 }
 
-Sprite* ResourceManager::CreateSprite(const wstring& key, Texture* texture, int32 x, int32 y, int32 cx, int32 cy)
+Sprite* ResourceManager::CreateSprite(const std::wstring& key, Texture* texture, int32 x, int32 y, int32 cx, int32 cy)
 {
 	if (_sprites.find(key) != _sprites.end())
 		return _sprites[key].get();
@@ -69,50 +69,50 @@ Sprite* ResourceManager::CreateSprite(const wstring& key, Texture* texture, int3
 	if (cy == 0)
 		cy = texture->GetSize().y;
 
-	auto sprite = make_unique<Sprite>(texture, x, y, cx, cy);
+	auto sprite = std::make_unique<Sprite>(texture, x, y, cx, cy);
 	Sprite* ptr = sprite.get();
 	_sprites[key] = move(sprite);
 
 	return ptr;
 }
 
-Flipbook* ResourceManager::GetFlipbook(const wstring& key)
+Flipbook* ResourceManager::GetFlipbook(const std::wstring& key)
 {
 	auto it = _flipbooks.find(key);
 	return it != _flipbooks.end() ? it->second.get() : nullptr;
 }
 
-Flipbook* ResourceManager::CreateFlipbook(const wstring& key)
+Flipbook* ResourceManager::CreateFlipbook(const std::wstring& key)
 {
 	if (_flipbooks.find(key) != _flipbooks.end())
 		return _flipbooks[key].get();
 
-	auto fb = make_unique<Flipbook>();
+	auto fb = std::make_unique<Flipbook>();
 	Flipbook* ptr = fb.get();
 	_flipbooks[key] = move(fb);
 
 	return ptr;
 }
 
-Tilemap* ResourceManager::GetTilemap(const wstring& key)
+Tilemap* ResourceManager::GetTilemap(const std::wstring& key)
 {
 	auto it = _tilemaps.find(key);
 	return it != _tilemaps.end() ? it->second.get() : nullptr;
 }
 
-Tilemap* ResourceManager::CreateTilemap(const wstring& key)
+Tilemap* ResourceManager::CreateTilemap(const std::wstring& key)
 {
 	if (_tilemaps.find(key) != _tilemaps.end())
 		return _tilemaps[key].get();
 
-	auto tm = make_unique<Tilemap>();
+	auto tm = std::make_unique<Tilemap>();
 	Tilemap* ptr = tm.get();
 	_tilemaps[key] = move(tm);
 
 	return ptr;
 }
 
-void ResourceManager::SaveTilemap(const wstring& key, const wstring& path)
+void ResourceManager::SaveTilemap(const std::wstring& key, const std::wstring& path)
 {
 	Tilemap* tilemap = GetTilemap(key);
 
@@ -120,12 +120,12 @@ void ResourceManager::SaveTilemap(const wstring& key, const wstring& path)
 	tilemap->SaveFile(fullPath);
 }
 
-Tilemap* ResourceManager::LoadTilemap(const wstring& key, const wstring& path)
+Tilemap* ResourceManager::LoadTilemap(const std::wstring& key, const std::wstring& path)
 {
 	Tilemap* tilemap = nullptr;
 
 	if (_tilemaps.find(key) == _tilemaps.end())
-		_tilemaps[key] = make_unique<Tilemap>();
+		_tilemaps[key] = std::make_unique<Tilemap>();
 		
 	tilemap = _tilemaps[key].get();
 
@@ -135,20 +135,20 @@ Tilemap* ResourceManager::LoadTilemap(const wstring& key, const wstring& path)
 	return tilemap;
 }
 
-Sound* ResourceManager::GetSound(const wstring& key)
+Sound* ResourceManager::GetSound(const std::wstring& key)
 {
 	auto it = _sounds.find(key);
 	return it != _sounds.end() ? it->second.get() : nullptr;
 }
 
-Sound* ResourceManager::LoadSound(const wstring& key, const wstring& path)
+Sound* ResourceManager::LoadSound(const std::wstring& key, const std::wstring& path)
 {
 	if (_sounds.find(key) != _sounds.end())
 		return _sounds[key].get();
 
 	fs::path fullPath = _resourcePath / path;
 
-	auto sound = make_unique<Sound>();
+	auto sound = std::make_unique<Sound>();
 	sound->LoadWave(fullPath);
 	Sound* ptr = sound.get();
 	_sounds[key] = move(sound);

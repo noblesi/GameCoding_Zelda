@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "Tilemap.h"
 #include <iostream>
 #include <fstream>
@@ -13,9 +13,9 @@ Tilemap::~Tilemap()
 
 }
 
-void Tilemap::LoadFile(const wstring& path)
+void Tilemap::LoadFile(const std::wstring& path)
 {
-	// C Ω∫≈∏¿œ
+	// C Ïä§ÌÉÄÏùº
 	if (false)
 	{
 		FILE* file = nullptr;
@@ -40,9 +40,9 @@ void Tilemap::LoadFile(const wstring& path)
 		return;
 	}
 
-	// C++ Ω∫≈∏¿œ
+	// C++ Ïä§ÌÉÄÏùº
 	{
-		wifstream ifs;
+		std::wifstream ifs;
 
 		ifs.open(path);
 
@@ -52,7 +52,7 @@ void Tilemap::LoadFile(const wstring& path)
 
 		for (int32 y = 0; y < _mapSize.y; y++)
 		{
-			wstring line;
+			std::wstring line;
 			ifs >> line;
 
 			for (int32 x = 0; x < _mapSize.x; x++)
@@ -66,9 +66,9 @@ void Tilemap::LoadFile(const wstring& path)
 	
 }
 
-void Tilemap::SaveFile(const wstring& path)
+void Tilemap::SaveFile(const std::wstring& path)
 {
-	// C Ω∫≈∏¿œ
+	// C Ïä§ÌÉÄÏùº
 	if (false)
 	{
 		FILE* file = nullptr;
@@ -91,14 +91,14 @@ void Tilemap::SaveFile(const wstring& path)
 		return;
 	}
 	
-	// C++ Ω∫≈∏¿œ
+	// C++ Ïä§ÌÉÄÏùº
 	{
-		wofstream ofs;
+		std::wofstream ofs;
 
 		ofs.open(path);
 
-		ofs << _mapSize.x << endl;
-		ofs << _mapSize.y << endl;
+		ofs << _mapSize.x << std::endl;
+		ofs << _mapSize.y << std::endl;
 
 		for (int32 y = 0; y < _mapSize.y; y++)
 		{
@@ -107,7 +107,7 @@ void Tilemap::SaveFile(const wstring& path)
 				ofs << _tiles[y][x].value;
 			}
 
-			ofs << endl;
+			ofs << std::endl;
 		}
 
 		ofs.close();
@@ -126,7 +126,7 @@ void Tilemap::SetMapSize(Vec2Int size)
 {
 	_mapSize = size;
 
-	_tiles = vector<vector<Tile>>(size.y, vector<Tile>(size.x));
+	_tiles = std::vector<std::vector<Tile>>(size.y, std::vector<Tile>(size.x));
 
 	for (int32 y = 0; y < size.y; y++)
 	{

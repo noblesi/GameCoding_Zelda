@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class Player;
 class Monster;
@@ -35,6 +35,6 @@ public:
 	GameRoomRef room;
 
 private:
-	static atomic<uint64> s_idGenerator;
+	static std::atomic<uint64> s_idGenerator;
 };
 

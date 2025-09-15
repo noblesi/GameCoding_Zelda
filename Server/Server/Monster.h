@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GameObject.h"
 
 class Monster : public GameObject
@@ -18,6 +18,6 @@ private:
 
 private:
 	uint64 _waitUntil = 0;
-	weak_ptr<Player> _target;
+	std::weak_ptr<Player> _target;
 };
 

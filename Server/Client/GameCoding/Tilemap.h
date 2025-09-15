@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ResourceBase.h"
 
 struct Tile
@@ -13,13 +13,13 @@ public:
 	Tilemap();
 	virtual ~Tilemap() override;
 
-	virtual void LoadFile(const wstring& path) override;
-	virtual void SaveFile(const wstring& path) override;
+	virtual void LoadFile(const std::wstring& path) override;
+	virtual void SaveFile(const std::wstring& path) override;
 
 	Vec2Int GetMapSize() { return _mapSize; }
 	int32 GetTileSize() { return _tileSize; }
 	Tile* GetTileAt(Vec2Int pos);
-	vector<vector<Tile>>& GetTiles() { return _tiles; };
+	std::vector<std::vector<Tile>>& GetTiles() { return _tiles; };
 	
 	void SetMapSize(Vec2Int size);
 	void SetTileSize(int32 size);
@@ -27,6 +27,6 @@ public:
 private:
 	Vec2Int _mapSize = {};
 	int32 _tileSize = {};
-	vector<vector<Tile>> _tiles;
+	std::vector<std::vector<Tile>> _tiles;
 };
 

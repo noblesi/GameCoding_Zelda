@@ -26,7 +26,7 @@ void NetworkManager::Init()
 
 		Logger::Warn("[NetworkManager] Start failed. retry " + std::to_string(i + 1) + "/" + std::to_string(maxRetry));
 
-		this_thread::sleep_for(chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
 	if (started == false)
@@ -55,20 +55,20 @@ void NetworkManager::Update()
 	}
 }
 
-void NetworkManager::SetServerInfo(const wstring& ip, uint16 port)
+void NetworkManager::SetServerInfo(const std::wstring& ip, uint16 port)
 {
 	_ip = ip;
 	_port = port;
-	_service = make_shared<ClientService>(
+	_service = std::make_shared<ClientService>(
 		NetAddress(ip, port),
-		make_shared<IocpCore>(),
+		std::make_shared<IocpCore>(),
 		[=]() { return CreateSession(); },
 		1);
 }
 
 ServerSessionRef NetworkManager::CreateSession()
 {
-	return _session = make_shared<ServerSession>();
+	return _session = std::make_shared<ServerSession>();
 }
 
 void NetworkManager::SendPacket(SendBufferRef sendBuffer)

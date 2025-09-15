@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Session.h"
 
 class GameSession : public PacketSession
@@ -6,7 +6,7 @@ class GameSession : public PacketSession
 public:
 	~GameSession()
 	{
-		cout << "~GameSession" << endl;
+		std::cout << "~GameSession" << std::endl;
 	}
 
 	virtual void OnConnected() override;
@@ -17,6 +17,6 @@ public:
 	GameSessionRef GetSessionRef() { return static_pointer_cast<GameSession>(shared_from_this()); }
 
 public:
-	weak_ptr<GameRoom> gameRoom;
-	weak_ptr<Player> player;
+	std::weak_ptr<GameRoom> gameRoom;
+	std::weak_ptr<Player> player;
 };

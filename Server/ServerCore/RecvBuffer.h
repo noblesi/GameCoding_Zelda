@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /*--------------
 	RecvBuffer
@@ -26,6 +26,6 @@ private:
 	int32			_bufferSize = 0;
 	int32			_readPos = 0;
 	int32			_writePos = 0;
-	vector<BYTE>	_buffer;
+	std::vector<BYTE>	_buffer;
 };
 

@@ -30,6 +30,6 @@ public:
 
 private:
 	int64 _idGenerator = 1;
-	unordered_map<int64, unique_ptr<GameObject>> _objects;
+	std::unordered_map<int64, std::unique_ptr<GameObject>> _objects;
 };
 

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Texture.h"
 
 Texture::Texture()
@@ -11,7 +11,7 @@ Texture::~Texture()
 
 }
 
-Texture* Texture::LoadBmp(HWND hwnd, const wstring& path)
+Texture* Texture::LoadBmp(HWND hwnd, const std::wstring& path)
 {
 	HDC hdc = ::GetDC(hwnd);
 

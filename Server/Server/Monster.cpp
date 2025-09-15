@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Monster.h"
 #include "GameRoom.h"
 #include "Player.h"
@@ -57,7 +57,7 @@ void Monster::UpdateIdle()
 		}
 		else
 		{
-			vector<Vec2Int> path;
+			std::vector<Vec2Int> path;
 			if (room->FindPath(GetCellPos(), target->GetCellPos(), OUT path))
 			{
 				if (path.size() > 1)

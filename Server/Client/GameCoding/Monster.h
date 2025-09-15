@@ -30,6 +30,6 @@ private:
 	Flipbook* _flipbookMove[4] = {};
 	float _waitSeconds = 0.f;
 
-	weak_ptr<Player> _target;
+	std::weak_ptr<Player> _target;
 };
 

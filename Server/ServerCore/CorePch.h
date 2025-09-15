@@ -20,7 +20,6 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <iostream>
-using namespace std;
 
 #include <assert.h>
 #include "SocketUtils.h"

@@ -12,7 +12,7 @@
 
 MyPlayer::MyPlayer()
 {
-	auto camera = make_shared<CameraComponent>();
+	auto camera = std::make_shared<CameraComponent>();
 	AddComponent(camera);
 }
 

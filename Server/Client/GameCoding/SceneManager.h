@@ -20,14 +20,14 @@ public:
 
 	class DevScene* GetDevScene();
 
-	shared_ptr<MyPlayer> GetMyPlayer() { return _myPlayer; }
+	std::shared_ptr<MyPlayer> GetMyPlayer() { return _myPlayer; }
 	uint64 GetMyPlayerId();
-	void SetMyPlayer(shared_ptr<MyPlayer> myPlayer) { _myPlayer = myPlayer; }
+	void SetMyPlayer(std::shared_ptr<MyPlayer> myPlayer) { _myPlayer = myPlayer; }
 
 private:
-	unique_ptr<Scene> _scene;
+	std::unique_ptr<Scene> _scene;
 	SceneType _sceneType = SceneType::None;
-	shared_ptr<MyPlayer> _myPlayer = nullptr;
+	std::shared_ptr<MyPlayer> _myPlayer = nullptr;
 
 public:
 	Vec2 GetCameraPos() { return _cameraPos; }

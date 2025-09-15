@@ -33,7 +33,7 @@ void Actor::Render(HDC hdc)
 	}
 }
 
-void Actor::AddComponent(shared_ptr<Component> component)
+void Actor::AddComponent(std::shared_ptr<Component> component)
 {
 	if (component == nullptr)
 		return;
@@ -42,7 +42,7 @@ void Actor::AddComponent(shared_ptr<Component> component)
 	_components.push_back(component);
 }
 
-void Actor::RemoveComponent(shared_ptr<Component> component)
+void Actor::RemoveComponent(std::shared_ptr<Component> component)
 {
 	auto findIt = std::find(_components.begin(), _components.end(), component);
 	if (findIt == _components.end())

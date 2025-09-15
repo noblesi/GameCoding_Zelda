@@ -51,7 +51,7 @@ void Monster::TickIdle()
 		return;
 
 	// Find Player
-	shared_ptr<Player> target = _target.lock();
+	std::shared_ptr<Player> target = _target.lock();
 	if (target == nullptr)
 	{
 		_target.reset();
@@ -73,7 +73,7 @@ void Monster::TickIdle()
 		}
 		else
 		{
-			vector<Vec2Int> path;
+			std::vector<Vec2Int> path;
 			if (scene->FindPath(GetCellPos(), target->GetCellPos(), OUT path))
 			{
 				if (path.size() > 1)

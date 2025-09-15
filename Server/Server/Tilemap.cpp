@@ -12,7 +12,7 @@ Tilemap::~Tilemap()
 
 }
 
-void Tilemap::LoadFile(const wstring& path)
+void Tilemap::LoadFile(const std::wstring& path)
 {
 	std::wifstream ifs(path);
 	if (ifs.is_open() == false)
@@ -49,7 +49,7 @@ void Tilemap::SetMapSize(Vec2Int size)
 {
 	_mapSize = size;
 
-	_tiles = vector<vector<Tile>>(size.y, vector<Tile>(size.x));
+	_tiles = std::vector<std::vector<Tile>>(size.y, std::vector<Tile>(size.x));
 
 	for (int32 y = 0; y < size.y; y++)
 	{

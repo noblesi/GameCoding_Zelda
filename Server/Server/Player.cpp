@@ -45,7 +45,7 @@ void Player::UpdateSkill()
     if (_waitUntil == 0)
     {
         _waitUntil = now + 500;
-        cout << "Player " << info.objectid() << " used skill" << endl;
+        std::cout << "Player " << info.objectid() << " used skill" << std::endl;
 
         if (room)
         {
@@ -57,7 +57,7 @@ void Player::UpdateSkill()
                 {
                     int32 hp = max(0, target->info.hp() - damage);
                     target->info.set_hp(hp);
-                    cout << "Player " << info.objectid() << " dealt" << damage << " damage to object " << target->info.objectid() << endl;
+                    std::cout << "Player " << info.objectid() << " dealt" << damage << " damage to object " << target->info.objectid() << std::endl;
                     if (target->room)
                     {
                         SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(target->info);
@@ -85,7 +85,7 @@ void Player::OnDamaged(int32 damage)
 
     int32 hp = max(0, info.hp() - damage);
     info.set_hp(hp);
-    cout << "Player " << info.objectid() << " took " << damage << " damage. HP: " << hp << endl;
+    std::cout << "Player " << info.objectid() << " took " << damage << " damage. HP: " << hp << std::endl;
     if (room)
     {
         SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(info);

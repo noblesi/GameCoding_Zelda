@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
 class GameSession;
 
-using GameSessionRef = shared_ptr<GameSession>;
+using GameSessionRef = std::shared_ptr<GameSession>;
 
 class GameSessionManager
 {
@@ -13,7 +13,7 @@ public:
 
 private:
 	USE_LOCK;
-	set<GameSessionRef> _sessions;
+	std::set<GameSessionRef> _sessions;
 };
 
 extern GameSessionManager GSessionManager;

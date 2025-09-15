@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ResourceBase.h"
 
 class Texture;
@@ -6,7 +6,7 @@ class Texture;
 struct FlipbookInfo
 {
 	Texture* texture = nullptr;
-	wstring name;
+	std::wstring name;
 	Vec2Int size = {};
 	int32 start = 0;
 	int32 end = 0;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Scene.h"
 
 class EditScene : public Scene
@@ -12,7 +12,7 @@ public:
 	virtual void Render(HDC hdc) override;
 
 private:
-	vector<pair<POINT, POINT>> _lines;
+	std::vector<std::pair<POINT, POINT>> _lines;
 
 	bool _setOrigin = true;
 	POINT _lastPos = {};

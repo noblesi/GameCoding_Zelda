@@ -1,12 +1,11 @@
-#pragma once
+﻿#pragma once
 #include <windows.h>
 #include <string>
-using namespace std;
 
 class Utils
 {
 public:
-	static void DrawText(HDC hdc, Pos pos, const wstring& str);
+	static void DrawText(HDC hdc, Pos pos, const std::wstring& str);
 
 	static void DrawRect(HDC hdc, Pos pos, int32 w, int32 h);
 
@@ -16,6 +15,6 @@ public:
 	
 	static void DrawLineColored(HDC hdc, Pos from, Pos to, COLORREF color);
 
-	static void ReadBmp(const wstring& path);
+	static void ReadBmp(const std::wstring& path);
 };
 

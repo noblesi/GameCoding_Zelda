@@ -30,7 +30,7 @@ void Panel::Render(HDC hdc)
         child->Render(hdc);
 }
 
-void Panel::AddChild(unique_ptr<Actor> child)
+void Panel::AddChild(std::unique_ptr<Actor> child)
 {
     if (child)
         _children.emplace_back(move(child));

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ResourceBase.h"
 
 class Texture : public ResourceBase
@@ -8,7 +8,7 @@ public:
 	virtual ~Texture();
 
 public:
-	Texture*	LoadBmp(HWND hwnd, const wstring& path);
+	Texture*	LoadBmp(HWND hwnd, const std::wstring& path);
 	HDC			GetDC();
 
 	void		SetSize(Vec2Int size) { _size = size; }

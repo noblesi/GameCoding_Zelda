@@ -1,7 +1,7 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Utils.h"
 
-void Utils::DrawText(HDC hdc, Pos pos, const wstring& str)
+void Utils::DrawText(HDC hdc, Pos pos, const std::wstring& str)
 {
 	::TextOut(hdc, static_cast<int32>(pos.x), static_cast<int32>(pos.y), str.c_str(), static_cast<int32>(str.size()));
 }
@@ -34,7 +34,7 @@ void Utils::DrawLineColored(HDC hdc, Pos from, Pos to, COLORREF color)
 	::DeleteObject(pen);
 }
 
-void Utils::ReadBmp(const wstring& path)
+void Utils::ReadBmp(const std::wstring& path)
 {
 	FILE* fp = nullptr;
 

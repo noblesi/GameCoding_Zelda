@@ -19,7 +19,7 @@ Service::~Service()
 
 void Service::CloseService()
 {
-	vector<SessionRef> sessions;
+	std::vector<SessionRef> sessions;
 	{
 		WRITE_LOCK;
 		sessions.assign(_sessions.begin(), _sessions.end());
@@ -97,11 +97,11 @@ bool ServerService::Start()
 	if (CanStart() == false)
 		return false;
 
-	_listener = make_shared<Listener>();
+	_listener = std::make_shared<Listener>();
 	if (_listener == nullptr)
 		return false;
 
-	ServerServiceRef service = static_pointer_cast<ServerService>(shared_from_this());
+	ServerServiceRef service = std::static_pointer_cast<ServerService>(shared_from_this());
 	if (_listener->StartAccept(service) == false)
 		return false;
 

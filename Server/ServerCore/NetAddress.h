@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /*--------------
 	NetAddress
@@ -9,10 +9,10 @@ class NetAddress
 public:
 	NetAddress() = default;
 	NetAddress(SOCKADDR_IN sockAddr);
-	NetAddress(wstring ip, uint16 port);
+	NetAddress(std::wstring ip, uint16 port);
 
 	SOCKADDR_IN&	GetSockAddr() { return _sockAddr; }
-	wstring			GetIpAddress();
+	std::wstring			GetIpAddress();
 	uint16			GetPort() { return ::ntohs(_sockAddr.sin_port); }
 
 public:

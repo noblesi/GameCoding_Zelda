@@ -13,9 +13,9 @@ public:
     virtual void Tick() override;
     virtual void Render(HDC hdc) override;
 
-    void AddChild(unique_ptr<Actor> child);
+    void AddChild(std::unique_ptr<Actor> child);
 
 protected:
-    vector<unique_ptr<Actor>> _children;
+    std::vector<std::unique_ptr<Actor>> _children;
 };
 

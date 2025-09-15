@@ -31,15 +31,15 @@ void SceneManager::ChangeScene(SceneType sceneType)
 	if (_sceneType == sceneType)
 		return;
 
-	unique_ptr<Scene> newScene;
+	std::unique_ptr<Scene> newScene;
 
 	switch (sceneType)
 	{
 		case SceneType::DevScene:
-			newScene = make_unique<DevScene>();
+			newScene = std::make_unique<DevScene>();
 			break;
 		case SceneType::EditScene:
-			newScene = make_unique<EditScene>();
+			newScene = std::make_unique<EditScene>();
 			break;
 	}
 

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 class SoundManager
@@ -10,11 +10,11 @@ class SoundManager
 public:
 	void Init(HWND hwnd);
 
-	void Play(const wstring& key, bool loop = false);
+	void Play(const std::wstring& key, bool loop = false);
 
 	LPDIRECTSOUND GetSoundDevice() { return _soundDevice; }
 
 private:
-	LPDIRECTSOUND _soundDevice = nullptr; // »ç¿îµå Ä«µå
+	LPDIRECTSOUND _soundDevice = nullptr; // ì‚¬ìš´ë“œ ì¹´ë“œ
 };
 

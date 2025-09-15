@@ -29,8 +29,8 @@ public:
 	virtual void Update() override;
 	virtual void Render(HDC hdc) override;
 
-	virtual void AddActor(shared_ptr<Actor> actor) override;
-	virtual void RemoveActor(shared_ptr<Actor> actor) override;
+	virtual void AddActor(std::shared_ptr<Actor> actor) override;
+	virtual void RemoveActor(std::shared_ptr<Actor> actor) override;
 
 	void LoadMap();
 	void LoadPlayer();
@@ -40,12 +40,12 @@ public:
 	void LoadTilemap();	
 
 	template<typename T>
-	shared_ptr<T> SpawnObject(Vec2Int pos)
+	std::shared_ptr<T> SpawnObject(Vec2Int pos)
 	{
 		auto isGameObject = std::is_convertible_v<T*, GameObject*>;
 		assert(isGameObject);
 
-		shared_ptr<T> ret = make_shared<T>();
+		std::shared_ptr<T> ret = std::make_shared<T>();
 		ret->SetCellPos(pos, true);
 		AddActor(ret);
 
@@ -57,7 +57,7 @@ public:
 	} 
 
 	template<typename T>
-	shared_ptr<T> SpawnObjectAtRandomPos()
+	std::shared_ptr<T> SpawnObjectAtRandomPos()
 	{
 		Vec2Int randPos = GetRandomEmptyCellPos();
 		return SpawnObject<T>(randPos);
@@ -68,10 +68,10 @@ public:
 	void Handle_S_RemoveObject(Protocol::S_RemoveObject& pkt);
 
 public:
-	shared_ptr<GameObject> GetObject(uint64 id);
+	std::shared_ptr<GameObject> GetObject(uint64 id);
 
 	Player* FindClosestPlayer(Vec2Int pos);
-	bool FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth = 10);
+	bool FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, int32 maxDepth = 10);
 	bool CanGo(Vec2Int cellPos);
 	Vec2 ConvertPos(Vec2Int cellPos);
 	Vec2Int GetRandomEmptyCellPos();
@@ -80,8 +80,8 @@ private:
 	void TickMonsterSpawn();
 
 	const int32 DESIRED_COUNT = 1;
-	shared_ptr<class TilemapActor> _tilemapActor;
+	std::shared_ptr<class TilemapActor> _tilemapActor;
 	int32 _monsterCount = 0;
-	vector<shared_ptr<Actor>> _ownedActors;
+	std::vector<std::shared_ptr<Actor>> _ownedActors;
 };
 

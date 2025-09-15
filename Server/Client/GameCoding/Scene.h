@@ -13,13 +13,13 @@ public:
 	virtual void Update() abstract;
 	virtual void Render(HDC hdc) abstract;
 
-	virtual void AddActor(shared_ptr<Actor> actor);
-	virtual void RemoveActor(shared_ptr<Actor> actor);
+	virtual void AddActor(std::shared_ptr<Actor> actor);
+	virtual void RemoveActor(std::shared_ptr<Actor> actor);
 
 	Creature* GetCreatureAt(Vec2Int cellPos);
 
 public:
-	vector<shared_ptr<Actor>> _actors[LAYER_MAXCOUNT];
-	vector<shared_ptr<Actor>> _pendingRemoveActors;
+	std::vector<std::shared_ptr<Actor>> _actors[LAYER_MAXCOUNT];
+	std::vector<std::shared_ptr<Actor>> _pendingRemoveActors;
 };
 

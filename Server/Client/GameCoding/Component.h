@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
 class Actor;
 
-class Component : public enable_shared_from_this<Component>
+class Component : public std::enable_shared_from_this<Component>
 {
 public:
 	Component();

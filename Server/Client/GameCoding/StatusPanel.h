@@ -17,8 +17,8 @@ public:
 
 private:
     NetworkManager* _networkManager = nullptr;
-    wstring _serverIp = L"127.0.0.1";
-    wstring _serverPort = L"7777";
+    std::wstring _serverIp = L"127.0.0.1";
+    std::wstring _serverPort = L"7777";
     bool _editingIp = false;
     bool _editingPort = false;
 };
