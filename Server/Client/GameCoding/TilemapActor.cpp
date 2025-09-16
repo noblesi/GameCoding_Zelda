@@ -126,9 +126,7 @@ void TilemapActor::TickPicking()
 		if (tile)
 		{
 			tile->value = 1;
+			tile->walkable = false;
 		}
-
-
 	}
-
 }

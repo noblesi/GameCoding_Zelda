@@ -527,7 +527,7 @@ bool DevScene::CanGo(Vec2Int cellPos)
 	if (GetCreatureAt(cellPos) != nullptr)
 		return false;
 
-	return tile->value != 1;
+	return tile->walkable;
 }
 
 Vec2 DevScene::ConvertPos(Vec2Int cellPos)

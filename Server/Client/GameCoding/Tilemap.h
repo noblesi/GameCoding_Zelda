@@ -5,6 +5,7 @@ struct Tile
 {
 	// TODO
 	int32 value = 0;
+	bool walkable = true;
 };
 
 class Tilemap : public ResourceBase

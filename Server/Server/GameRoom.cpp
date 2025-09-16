@@ -349,7 +349,7 @@ bool GameRoom::CanGo(Vec2Int cellPos)
 	if (GetGameObjectAt(cellPos) != nullptr)
 		return false;
 
-	return tile->value != 1;
+	return tile->walkable;
 }
 
 Vec2Int GameRoom::GetRandomEmptyCellPos()
