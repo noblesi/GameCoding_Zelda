@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /*----------------
 	BufferWriter
@@ -46,8 +46,8 @@ T* BufferWriter::Reserve()
 template<typename T>
 BufferWriter& BufferWriter::operator<<(T&& src)
 {
-	using DataType = std::remove_reference_t<T>;
-	*reinterpret_cast<DataType*>(&_buffer[_pos]) = std::forward<DataType>(src);
+	using DataType = remove_reference_t<T>;
+	*reinterpret_cast<DataType*>(&_buffer[_pos]) = forward<DataType>(src);
 	_pos += sizeof(T);
 	return *this;
 }

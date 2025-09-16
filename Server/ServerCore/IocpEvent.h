@@ -26,6 +26,6 @@ struct IocpEvent : public OVERLAPPED
 	SessionRef		session = nullptr; // Accept Only
 
 	// TEMP
-	std::vector<BYTE> buffer;
-	std::vector<SendBufferRef> sendBuffers;
+	vector<BYTE> buffer;
+	vector<SendBufferRef> sendBuffers;
 };

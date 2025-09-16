@@ -14,9 +14,9 @@ enum class ServiceType : uint8
 	Service
 --------------*/
 
-using SessionFactory = std::function<SessionRef(void)>;
+using SessionFactory = function<SessionRef(void)>;
 
-class Service : public std::enable_shared_from_this<Service>
+class Service : public enable_shared_from_this<Service>
 {
 public:
 	Service(ServiceType type, NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
@@ -45,7 +45,7 @@ protected:
 	NetAddress			_netAddress = {};
 	IocpCoreRef			_iocpCore;
 
-	std::set<SessionRef>		_sessions;
+	set<SessionRef>		_sessions;
 	int32				_sessionCount = 0;
 	int32				_maxSessionCount = 0;
 	SessionFactory		_sessionFactory;
@@ -71,7 +71,6 @@ public:
 
 class ServerService : public Service
 {
-	friend class Service;
 public:
 	ServerService(NetAddress targetAddress, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
 	virtual ~ServerService() {}

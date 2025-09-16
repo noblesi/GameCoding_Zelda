@@ -12,7 +12,7 @@ public:
 	virtual void Render(HDC hdc) override;
 
 private:
-	std::vector<std::pair<POINT, POINT>> _lines;
+	vector<pair<POINT, POINT>> _lines;
 
 	bool _setOrigin = true;
 	POINT _lastPos = {};

@@ -87,32 +87,24 @@ void DevScene::Render(HDC hdc)
 
 }
 
-void DevScene::AddActor(std::shared_ptr<Actor> actor)
+void DevScene::AddActor(Actor* actor)
 {
 	Super::AddActor(actor);
 
-	Monster* creature = dynamic_cast<Monster*>(actor.get());
+	Monster* creature = dynamic_cast<Monster*>(actor);
 	if (creature)
 	{
 		_monsterCount++;
 	}
 }
 
-void DevScene::RemoveActor(std::shared_ptr<Actor> actor)
+void DevScene::RemoveActor(Actor* actor)
 {
 	Super::RemoveActor(actor);
 
-	bool wasMonster = dynamic_cast<Monster*>(actor.get()) != nullptr;
+	Monster* creature = dynamic_cast<Monster*>(actor);
 
-	auto it = remove_if(_ownedActors.begin(), _ownedActors.end(),
-		[actor](const std::shared_ptr<Actor>& ptr)
-		{
-			return ptr == actor;
-		});
-	_ownedActors.erase(it, _ownedActors.end());
-
-	
-	if (wasMonster)
+	if (creature)
 	{
 		_monsterCount--;
 	}
@@ -122,14 +114,13 @@ void DevScene::LoadMap()
 {
 	Sprite* sprite = GET_SINGLE(ResourceManager)->GetSprite(L"Stage01");
 
-	auto background = std::make_shared<SpriteActor>();
+	SpriteActor* background = new SpriteActor();
 	background->SetSprite(sprite);
 	background->SetLayer(LAYER_BACKGROUND);
 	const Vec2Int size = sprite->GetSize();
 	background->SetPos(Vec2(size.x / 2, size.y / 2));
 
 	AddActor(background);
-	_ownedActors.push_back(background);
 }
 
 void DevScene::LoadPlayer()
@@ -303,11 +294,11 @@ void DevScene::LoadEffect()
 
 void DevScene::LoadTilemap()
 {
-	auto actor = std::make_shared<TilemapActor>();
+	TilemapActor* actor = new TilemapActor();
 	AddActor(actor);
 
 	_tilemapActor = actor;
-	_ownedActors.push_back(actor);
+	
 	{
 		auto* tm = GET_SINGLE(ResourceManager)->CreateTilemap(L"Tilemap_01");
 		tm->SetMapSize({ 63, 43 });
@@ -333,23 +324,17 @@ void DevScene::Handle_S_AddObject(Protocol::S_AddObject& pkt)
 
 		if (info.objecttype() == Protocol::OBJECT_TYPE_PLAYER)
 		{
-			auto player = SpawnObject<Player>(Vec2Int{info.posx(), info.posy()});
-
+			Player* player = SpawnObject<Player>(Vec2Int{ info.posx(), info.posy() });
 			player->SetDir(info.dir());
 			player->SetState(info.state());
 			player->info = info;
-
-			std::cout << "[DevScene] Spawned object ID : " << info.objectid() << std::endl;
 		}
 		else if (info.objecttype() == Protocol::OBJECT_TYPE_MONSTER)
 		{
-			auto monster = SpawnObject<Monster>(Vec2Int{ info.posx(), info.posy() });
-
+			Monster* monster = SpawnObject<Monster>(Vec2Int{ info.posx(), info.posy() });
 			monster->SetDir(info.dir());
 			monster->SetState(info.state());
 			monster->info = info;
-
-			std::cout << "[DevScene] Spawned object ID : " << info.objectid() << std::endl;
 		}
 	}
 }
@@ -361,17 +346,17 @@ void DevScene::Handle_S_RemoveObject(Protocol::S_RemoveObject& pkt)
 	{
 		int32 id = pkt.ids(i);
 
-		std::shared_ptr<GameObject> object = GetObject(id);
+		GameObject* object = GetObject(id);
 		if (object)
 			RemoveActor(object);
 	}
 }
 
-std::shared_ptr<GameObject> DevScene::GetObject(uint64 id)
+GameObject* DevScene::GetObject(uint64 id)
 {
-	for (const std::shared_ptr<Actor> actor : _actors[LAYER_OBJECT])
+	for (Actor* actor : _actors[LAYER_OBJECT])
 	{
-		std::shared_ptr<GameObject> gameObject = dynamic_pointer_cast<GameObject>(actor);
+		GameObject* gameObject = dynamic_cast<GameObject*>(actor);
 		if (gameObject && gameObject->info.objectid() == id)
 			return gameObject;
 	}
@@ -384,9 +369,9 @@ Player* DevScene::FindClosestPlayer(Vec2Int pos)
 	float best = FLT_MAX;
 	Player* ret = nullptr;
 
-	for (const std::shared_ptr<Actor>& actor : _actors[LAYER_OBJECT])
+	for (Actor* actor : _actors[LAYER_OBJECT])
 	{
-		Player* player = dynamic_cast<Player*>(actor.get());
+		Player* player = dynamic_cast<Player*>(actor);
 		if (player)
 		{
 			Vec2Int dir = pos - player->GetCellPos();
@@ -404,7 +389,7 @@ Player* DevScene::FindClosestPlayer(Vec2Int pos)
 
 // A* -> Dijikstra -> BFS -> Graph
 // PQ
-bool DevScene::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, int32 maxDepth)
+bool DevScene::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth)
 {
 	// F = G + H
 	// F = 최종 점수(작을 수록 좋음)
@@ -414,9 +399,9 @@ bool DevScene::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, i
 	if (depth >= maxDepth)
 		return false;
 
-	std::priority_queue<PQNode, std::vector<PQNode>, std::greater<PQNode>> pq;
-	std::map<Vec2Int, int32> best;
-	std::map<Vec2Int, Vec2Int> parent;
+	priority_queue<PQNode, vector<PQNode>, greater<PQNode>> pq;
+	map<Vec2Int, int32> best;
+	map<Vec2Int, Vec2Int> parent;
 
 	// 초기값
 	{
@@ -521,7 +506,7 @@ bool DevScene::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, i
 		pos = parent[pos];
 	}
 
-	std::reverse(path.begin(), path.end());
+	reverse(path.begin(), path.end());
 	return true;
 }
 
@@ -549,7 +534,7 @@ Vec2 DevScene::ConvertPos(Vec2Int cellPos)
 {
 	Vec2 ret = {};
 
-	if (!_tilemapActor)
+	if (_tilemapActor == nullptr)
 		return ret;
 
 	Tilemap* tm = _tilemapActor->GetTilemap();
@@ -569,7 +554,7 @@ Vec2Int DevScene::GetRandomEmptyCellPos()
 {
 	Vec2Int ret = {-1, -1};
 
-	if (!_tilemapActor)
+	if (_tilemapActor == nullptr)
 		return ret;
 
 	Tilemap* tm = _tilemapActor->GetTilemap();

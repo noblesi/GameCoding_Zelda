@@ -5,7 +5,7 @@
 #include "GameSession.h"
 #include <filesystem>
 
-GameRoomRef GRoom = std::make_shared<GameRoom>();
+GameRoomRef GRoom = make_shared<GameRoom>();
 
 GameRoom::GameRoom()
 {
@@ -24,34 +24,21 @@ void GameRoom::Init()
 	monster->info.set_posy(8);
 	AddObject(monster);
 
-	std::filesystem::path tilemapPath = std::filesystem::current_path() / "Resources" / "Tilemap" / "Tilemap_01.txt";
+	filesystem::path tilemapPath = filesystem::current_path() / "Resources" / "Tilemap" / "Tilemap_01.txt";
 	_tilemap.LoadFile(tilemapPath.wstring());
 }
 
 void GameRoom::Update()
 {
-	ProcessMoveRequests();
-
-	std::vector<uint64> removeIds;
-
 	for (auto& item : _players)
 	{
 		item.second->Update();
-
-		if (item.second->info.hp() <= 0)
-			removeIds.push_back(item.first);
 	}
 
 	for (auto& item : _monsters)
 	{
 		item.second->Update();
-
-		if (item.second->info.hp() <= 0)
-			removeIds.push_back(item.first);
 	}
-
-	for (uint64 id : removeIds)
-		RemoveObject(id);
 }
 
 void GameRoom::EnterRoom(GameSessionRef session)
@@ -81,8 +68,6 @@ void GameRoom::EnterRoom(GameSessionRef session)
 
 		for (auto& item : _players)
 		{
-			if (item.first == player->info.objectid())
-				continue;
 			Protocol::ObjectInfo* info = pkt.add_objects();
 			*info = item.second->info;
 		}
@@ -97,7 +82,7 @@ void GameRoom::EnterRoom(GameSessionRef session)
 		session->Send(sendBuffer);
 	}
 
-	
+	AddObject(player);
 }
 
 void GameRoom::LeaveRoom(GameSessionRef session)
@@ -134,111 +119,16 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	if (gameObject == nullptr)
 		return;
 
-	PlayerRef player = dynamic_pointer_cast<Player>(gameObject);
-	if (player == nullptr)
-		return;
+	// TODO : Validation
+	gameObject->info.set_state(pkt.info().state());
+	gameObject->info.set_dir(pkt.info().dir());
+	gameObject->info.set_posx(pkt.info().posx());
+	gameObject->info.set_posy(pkt.info().posy());
 
-	if (pkt.seq() <= player->lastMoveSeq)
-		return;
-	player->lastMoveSeq = pkt.seq();
-
-	Vec2Int curPos = gameObject->GetCellPos();
-	Vec2Int targetPos{ pkt.info().posx(), pkt.info().posy() };
-	Vec2Int delta = targetPos - curPos; // 목표 지점과 현재 위치의 차이 계산
-
-	auto sendCorrection = [&]()
-		{
-			// 서버기준 위치로 수정 패킷 전송
-			SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info, player->lastMoveSeq);
-
-			if (player->session)
-				player->session->Send(sendBuffer);
-		};
-
-	bool invalid = false; // 검증 실패 여부
-
-	if (delta.LengthSquared() > 1)
 	{
-		// delta 방향을 따라 한 칸씩 이동 가능 여부 확인
-		if (delta.x != 0 && delta.y != 0)
-		{
-			// 대각선 이동은 허용하지 않음
-			invalid = true;
-		}
-		else
-		{
-			Vec2Int stepDir
-			{
-					(delta.x > 0) ? 1 : (delta.x < 0 ? -1 : 0),
-					(delta.y > 0) ? 1 : (delta.y < 0 ? -1 : 0)
-			};
-
-			int32 steps = abs(delta.x) + abs(delta.y);
-			Vec2Int nextPos = curPos;
-			for (int32 i = 0; i < steps; ++i)
-			{
-				nextPos += stepDir;
-				if (CanGo(nextPos) == false)
-				{
-					invalid = true;
-					break;
-				}
-			}
-
-			if (invalid == false)
-			{
-				targetPos = nextPos;
-
-				Dir expectedDir = DIR_UP;
-				if (stepDir.x == 1 && stepDir.y == 0) expectedDir = DIR_RIGHT;
-				else if (stepDir.x == -1 && stepDir.y == 0) expectedDir = DIR_LEFT;
-				else if (stepDir.x == 0 && stepDir.y == 1) expectedDir = DIR_DOWN;
-				else if (stepDir.x == 0 && stepDir.y == -1) expectedDir = DIR_UP;
-
-				if (pkt.info().dir() != expectedDir)
-					invalid = true;
-			}
-		}
+		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
+		Broadcast(sendBuffer);
 	}
-
-	if (pkt.info().state() == MOVE && delta.LengthSquared() == 0)
-		invalid = true; // 이동상태인데 좌표변화가 없으면 무효
-
-	if (delta.LengthSquared() == 1)
-	{
-		// 이동방향이 맞는지 확인
-		Dir expectedDir = DIR_UP;
-		if (delta.x == 1 && delta.y == 0) expectedDir = DIR_RIGHT;
-		else if (delta.x == -1 && delta.y == 0) expectedDir = DIR_LEFT;
-		else if (delta.x == 0 && delta.y == 1) expectedDir = DIR_DOWN;
-		else if (delta.x == 0 && delta.y == -1) expectedDir = DIR_UP;
-
-		if (pkt.info().dir() != expectedDir)
-			invalid = true; // 방향 불일치
-	}
-
-	if (delta.LengthSquared() != 0 && CanGo(targetPos, id) == false)
-		invalid = true; // 벽 또는 다른 오브젝트와 충돌
-
-	if (invalid)
-	{
-		std::cout << "Invalid move packet from object" << id << std::endl; // 서버 로그 출력
-		player->invalidMoveCount++;
-		if (player->invalidMoveCount >= 5)
-		{
-			// 반복 위반시 세션 종료
-			if (player->session)
-				player->session->Disconnect(L"Invalid Move Packet");
-		}
-		else
-		{
-			sendCorrection(); // 위치 수정 패킷 전송
-		}
-
-		return;
-	}
-
-	_moveRequests.push_back({ player, id, targetPos, pkt.info().state(), pkt.info().dir() });
 }
 
 void GameRoom::AddObject(GameObjectRef gameObject)
@@ -334,15 +224,15 @@ PlayerRef GameRoom::FindClosestPlayer(Vec2Int pos)
 	return ret;
 }
 
-bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, int32 maxDepth /*= 10*/)
+bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth /*= 10*/)
 {
 	int32 depth = abs(src.y - dest.y) + abs(src.x - dest.x);
 	if (depth >= maxDepth)
 		return false;
 
-	std::priority_queue<PQNode, std::vector<PQNode>, std::greater<PQNode>> pq;
-	std::map<Vec2Int, int32> best;
-	std::map<Vec2Int, Vec2Int> parent;
+	priority_queue<PQNode, vector<PQNode>, greater<PQNode>> pq;
+	map<Vec2Int, int32> best;
+	map<Vec2Int, Vec2Int> parent;
 
 	// 초기값
 	{
@@ -447,21 +337,21 @@ bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, i
 		pos = parent[pos];
 	}
 
-	std::reverse(path.begin(), path.end());
+	reverse(path.begin(), path.end());
 	return true;
 }
 
 bool GameRoom::CanGo(Vec2Int cellPos, uint64 ignoreId)
 {
-	auto tile = _tilemap.GetTileAt(cellPos);
-	if (tile.has_value() == false)
+	Tile* tile = _tilemap.GetTileAt(cellPos);
+	if (tile == nullptr)
 		return false;
 
 	// 몬스터 충돌?
-	if (GetGameObjectAt(cellPos, ignoreId) != nullptr)
+	if (GetGameObjectAt(cellPos) != nullptr)
 		return false;
 
-	return tile->get().value != 1;
+	return tile->value != 1;
 }
 
 Vec2Int GameRoom::GetRandomEmptyCellPos()
@@ -482,100 +372,19 @@ Vec2Int GameRoom::GetRandomEmptyCellPos()
 	}
 }
 
-GameObjectRef GameRoom::GetGameObjectAt(Vec2Int cellPos, uint64 ignoreId)
+GameObjectRef GameRoom::GetGameObjectAt(Vec2Int cellPos)
 {
 	for (auto& item : _players)
 	{
-		if (item.first == ignoreId)
-			continue;
 		if (item.second->GetCellPos() == cellPos)
 			return item.second;
 	}
 
 	for (auto& item : _monsters)
 	{
-		if (item.first == ignoreId)
-			continue;
 		if (item.second->GetCellPos() == cellPos)
 			return item.second;
 	}
 
 	return nullptr;
-}
-
-void GameRoom::ProcessMoveRequests()
-{
-	if (_moveRequests.empty())
-		return;
-
-	std::set<uint64> movingIds;
-	std::map<Vec2Int, int32> destCounts;
-
-	for (auto& req : _moveRequests)
-	{
-		movingIds.insert(req.id);
-		destCounts[req.targetPos]++;
-	}
-
-	std::vector<MoveRequest> valid;
-
-	for (auto& req : _moveRequests)
-	{
-		PlayerRef player = req.player;
-		if (player == nullptr)
-			continue;
-
-		bool invalid = false;
-
-		auto tile = _tilemap.GetTileAt(req.targetPos);
-		if (tile.has_value() == false || tile->get().value == 1)
-			invalid = true;
-
-		GameObjectRef occupant = GetGameObjectAt(req.targetPos);
-		if (occupant)
-		{
-			uint64 occId = occupant->info.objectid();
-			if (movingIds.find(occId) == movingIds.end())
-				invalid = true;
-		}
-
-		if (destCounts[req.targetPos] > 1)
-			invalid = true;
-
-		if (invalid)
-		{
-			std::cout << "Invalid move packet from object" << req.id << std::endl;
-			player->invalidMoveCount++;
-			if (player->invalidMoveCount >= 5)
-			{
-				if (player->session)
-					player->session->Disconnect(L"Invalid Move Packet");
-			}
-			else
-			{
-				SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(player->info);
-				if (player->session)
-					player->session->Send(sendBuffer);
-			}
-		}
-		else
-		{
-			player->invalidMoveCount = 0;
-			valid.push_back(req);
-		}
-	}
-
-	for (auto& req : valid)
-	{
-		PlayerRef player = req.player;
-		player->info.set_state(req.state);
-		player->info.set_dir(req.dir);
-		player->info.set_posx(req.targetPos.x);
-		player->info.set_posy(req.targetPos.y);
-
-		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(player->info);
-		Broadcast(sendBuffer);
-	}
-
-	_moveRequests.clear();
 }

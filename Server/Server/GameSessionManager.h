@@ -2,7 +2,7 @@
 
 class GameSession;
 
-using GameSessionRef = std::shared_ptr<GameSession>;
+using GameSessionRef = shared_ptr<GameSession>;
 
 class GameSessionManager
 {
@@ -13,7 +13,7 @@ public:
 
 private:
 	USE_LOCK;
-	std::set<GameSessionRef> _sessions;
+	set<GameSessionRef> _sessions;
 };
 
 extern GameSessionManager GSessionManager;

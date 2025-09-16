@@ -11,7 +11,7 @@ Texture::~Texture()
 
 }
 
-Texture* Texture::LoadBmp(HWND hwnd, const std::wstring& path)
+Texture* Texture::LoadBmp(HWND hwnd, const wstring& path)
 {
 	HDC hdc = ::GetDC(hwnd);
 

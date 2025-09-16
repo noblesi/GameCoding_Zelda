@@ -18,7 +18,6 @@ void GameSessionManager::Remove(GameSessionRef session)
 
 void GameSessionManager::Broadcast(SendBufferRef sendBuffer)
 {
-	READ_LOCK;
 	for (GameSessionRef session : _sessions)
 	{
 		session->Send(sendBuffer);

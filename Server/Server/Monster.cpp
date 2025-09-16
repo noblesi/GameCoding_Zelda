@@ -57,7 +57,7 @@ void Monster::UpdateIdle()
 		}
 		else
 		{
-			std::vector<Vec2Int> path;
+			vector<Vec2Int> path;
 			if (room->FindPath(GetCellPos(), target->GetCellPos(), OUT path))
 			{
 				if (path.size() > 1)

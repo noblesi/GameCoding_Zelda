@@ -18,8 +18,8 @@ public:
 	void Stop(bool reset = false);
 
 private:
-	virtual void LoadFile(const std::wstring& path) {}
-	virtual void SaveFile(const std::wstring& path) {}
+	virtual void LoadFile(const wstring& path) {}
+	virtual void SaveFile(const wstring& path) {}
 
 private:
 	LPDIRECTSOUNDBUFFER _soundBuffer = nullptr;

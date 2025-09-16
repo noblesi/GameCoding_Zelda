@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#include <optional>
-#include <functional>
-
 struct Tile
 {
 	// TODO
@@ -15,12 +12,12 @@ public:
 	Tilemap();
 	virtual ~Tilemap();
 
-	virtual void LoadFile(const std::wstring& path);
+	virtual void LoadFile(const wstring& path);
 	
 	Vec2Int GetMapSize() { return _mapSize; }
 	int32 GetTileSize() { return _tileSize; }
-	std::optional<std::reference_wrapper<Tile>> GetTileAt(Vec2Int pos);
-	std::vector<std::vector<Tile>>& GetTiles() { return _tiles; };
+	Tile* GetTileAt(Vec2Int pos);
+	vector<vector<Tile>>& GetTiles() { return _tiles; };
 
 	void SetMapSize(Vec2Int size);
 	void SetTileSize(int32 size);
@@ -28,6 +25,6 @@ public:
 private:
 	Vec2Int _mapSize = {};
 	int32 _tileSize = {};
-	std::vector<std::vector<Tile>> _tiles;
+	vector<vector<Tile>> _tiles;
 };
 

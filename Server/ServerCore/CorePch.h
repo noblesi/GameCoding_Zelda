@@ -5,7 +5,6 @@
 #include "CoreTLS.h"
 #include "CoreGlobal.h"
 
-
 #include <vector>
 #include <list>
 #include <queue>
@@ -20,6 +19,7 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <iostream>
+using namespace std;
 
 #include <assert.h>
 #include "SocketUtils.h"

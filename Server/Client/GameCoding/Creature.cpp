@@ -52,7 +52,7 @@ void Creature::OnDamaged(Creature* attacker)
 		Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
 		if (scene)
 		{
-			scene->RemoveActor(shared_from_this());
+			scene->RemoveActor(this);
 		}
 	}
 }

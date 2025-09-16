@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CorePch.h"
 #include "Types.h"
@@ -17,7 +17,7 @@
 // C++20
 #include <format>
 #include <filesystem>
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 #define _CRTDEBG_MAP_ALLOC
 #include <cstdlib>
@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
 
 #pragma comment(lib, "msimg32.lib")
 
-// »ç¿îµå
+// ì‚¬ìš´ë“œ
 #include <MMSystem.h>
 #include <dsound.h>
 #pragma comment (lib, "winmm.lib")

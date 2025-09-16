@@ -18,6 +18,6 @@ private:
 
 private:
 	uint64 _waitUntil = 0;
-	std::weak_ptr<Player> _target;
+	weak_ptr<Player> _target;
 };
 

@@ -6,7 +6,7 @@ class Texture;
 struct FlipbookInfo
 {
 	Texture* texture = nullptr;
-	std::wstring name;
+	wstring name;
 	Vec2Int size = {};
 	int32 start = 0;
 	int32 end = 0;

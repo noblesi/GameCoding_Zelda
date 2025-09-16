@@ -19,22 +19,7 @@ Service::~Service()
 
 void Service::CloseService()
 {
-	std::vector<SessionRef> sessions;
-	{
-		WRITE_LOCK;
-		sessions.assign(_sessions.begin(), _sessions.end());
-	}
-
-	for (SessionRef session : sessions)
-		session->Disconnect(L"Service Closed");
-
-	if (_type == ServiceType::Server)
-	{
-		ServerService* serverService = static_cast<ServerService*>(this);
-		serverService->_listener = nullptr;
-	}
-
-	_iocpCore = nullptr;
+	//TODO
 }
 
 SessionRef Service::CreateSession()
@@ -97,11 +82,11 @@ bool ServerService::Start()
 	if (CanStart() == false)
 		return false;
 
-	_listener = std::make_shared<Listener>();
+	_listener = make_shared<Listener>();
 	if (_listener == nullptr)
 		return false;
 
-	ServerServiceRef service = std::static_pointer_cast<ServerService>(shared_from_this());
+	ServerServiceRef service = static_pointer_cast<ServerService>(shared_from_this());
 	if (_listener->StartAccept(service) == false)
 		return false;
 
@@ -110,8 +95,7 @@ bool ServerService::Start()
 
 void ServerService::CloseService()
 {
-	if (_listener)
-		_listener->CloseSocket();
+	//TODO
 
 	Service::CloseService();
 }

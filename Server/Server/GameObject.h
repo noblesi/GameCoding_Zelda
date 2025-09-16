@@ -35,6 +35,6 @@ public:
 	GameRoomRef room;
 
 private:
-	static std::atomic<uint64> s_idGenerator;
+	static atomic<uint64> s_idGenerator;
 };
 

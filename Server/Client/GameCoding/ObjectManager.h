@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "GameObject.h"
+
+class GameObject;
 
 class ObjectManager
 {
@@ -9,14 +10,13 @@ public:
 	template<typename T>
 	T* AddObject()
 	{
-		auto object = make_unique<T>();
+		T* object = new T();
 
 		int64 id = _idGenerator++;
 		object->SetObjectID(id);
-		T* raw = object.get();
-		_objects[id] = move(object);
+		_objects[id] = object;
 
-		return raw;
+		return object;
 	}
 
 	void RemoveObject(int64 id)
@@ -26,10 +26,11 @@ public:
 			return;
 
 		_objects.erase(id);
+		// TODO : Delete?
 	}
 
 private:
 	int64 _idGenerator = 1;
-	std::unordered_map<int64, std::unique_ptr<GameObject>> _objects;
+	unordered_map<int64, GameObject*> _objects;
 };
 

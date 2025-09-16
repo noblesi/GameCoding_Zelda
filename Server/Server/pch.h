@@ -2,13 +2,13 @@
 
 #include "CorePch.h"
 
-using GameSessionRef = std::shared_ptr<class GameSession>;
-using GameRoomRef = std::shared_ptr<class GameRoom>; 
+using GameSessionRef = shared_ptr<class GameSession>;
+using GameRoomRef = shared_ptr<class GameRoom>; 
 
-using GameObjectRef = std::shared_ptr<class GameObject>;
-using CreatureRef = std::shared_ptr<class Creature>;
-using PlayerRef = std::shared_ptr<class Player>;
-using MonsterRef = std::shared_ptr<class Monster>;
+using GameObjectRef = shared_ptr<class GameObject>;
+using CreatureRef = shared_ptr<class Creature>;
+using PlayerRef = shared_ptr<class Player>;
+using MonsterRef = shared_ptr<class Monster>;
 
 #include "Enum.pb.h"
 using Dir = Protocol::DIR_TYPE;

@@ -85,7 +85,7 @@ void ClientPacketHandler::Handle_S_MyPlayer(ServerSessionRef session, BYTE* buff
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
 	{
-		auto myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
+		MyPlayer* myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
 		myPlayer->info = info;
 		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer);
 	}
@@ -99,12 +99,6 @@ void ClientPacketHandler::Handle_S_AddObject(ServerSessionRef session, BYTE* buf
 
 	Protocol::S_AddObject pkt;
 	pkt.ParseFromArray(&header[1], size - sizeof(PacketHeader));
-
-	for (int32 i = 0; i < pkt.objects_size(); i++)
-	{
-		const Protocol::ObjectInfo& info = pkt.objects(i);
-		std::cout << "[Client] Received object ID : " << info.objectid() << std::endl;
-	}
 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
@@ -123,18 +117,8 @@ void ClientPacketHandler::Handle_S_RemoveObject(ServerSessionRef session, BYTE* 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
 	{
-		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
-		for (int32 i = 0; i < pkt.ids_size(); i++)
-		{
-			if (pkt.ids(i) == myPlayerId)
-			{
-				GET_SINGLE(SceneManager)->SetMyPlayer(nullptr);
-				break;
-			}
-		}
 		scene->Handle_S_RemoveObject(pkt);
 	}
-		
 }
 
 void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, int32 len)
@@ -148,57 +132,30 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 	
 	const Protocol::ObjectInfo& info = pkt.info();
 
-	uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
-	if (info.objectid() == myPlayerId)
-	{
-		static int32 s_lastSeq = 0;
-		if (pkt.seq() <= s_lastSeq)
-			return;
-		s_lastSeq = pkt.seq();
-	}
-
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
 	if (scene)
 	{
 		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
 		if (myPlayerId == info.objectid())
-		{
-			std::shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
-			if (myPlayer)
-			{
-				myPlayer->SetDir(info.dir());
-				myPlayer->SetState(info.state());
+			return;
 
-				Vec2Int curPos = myPlayer->GetCellPos();
-				Vec2Int serverPos{ info.posx(), info.posy() };
-				Vec2Int delta = serverPos - curPos;
-				const int32 threshold = 1;
-				if (delta.LengthSquared() > threshold * threshold)
-					myPlayer->SetCellPos(serverPos, true);
-			}
-		}
-		else
+		GameObject* gameObject = scene->GetObject(info.objectid());
+		if (gameObject)
 		{
-			std::shared_ptr<GameObject> gameObject = scene->GetObject(info.objectid());
-			if (gameObject)
-			{
-				gameObject->SetDir(info.dir());
-				gameObject->SetState(info.state());
-				gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });
-			}
+			gameObject->SetDir(info.dir());
+			gameObject->SetState(info.state());
+			gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });
 		}
 	}
 }
 
 SendBufferRef ClientPacketHandler::Make_C_Move()
 {
-	static int32 s_seq = 0;
 	Protocol::C_Move pkt;
 
-	std::shared_ptr<MyPlayer> myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+	MyPlayer* myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 
 	*pkt.mutable_info() = myPlayer->info;
-	pkt.set_seq(++s_seq);
 
 	return MakeSendBuffer(pkt, C_Move);
 }

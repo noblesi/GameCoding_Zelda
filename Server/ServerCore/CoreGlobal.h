@@ -1,5 +1,5 @@
-#pragma once
+﻿#pragma once
 
 class ThreadManager;
 
-extern std::unique_ptr<ThreadManager> GThreadManager;
+unique_ptr<ThreadManager> GThreadManager = make_unique<ThreadManager>();

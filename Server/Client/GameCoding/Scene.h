@@ -2,6 +2,7 @@
 
 class Actor;
 class Creature;
+class UI;
 
 class Scene
 {
@@ -13,13 +14,13 @@ public:
 	virtual void Update() abstract;
 	virtual void Render(HDC hdc) abstract;
 
-	virtual void AddActor(std::shared_ptr<Actor> actor);
-	virtual void RemoveActor(std::shared_ptr<Actor> actor);
+	virtual void AddActor(Actor* actor);
+	virtual void RemoveActor(Actor* actor);
 
 	Creature* GetCreatureAt(Vec2Int cellPos);
 
 public:
-	std::vector<std::shared_ptr<Actor>> _actors[LAYER_MAXCOUNT];
-	std::vector<std::shared_ptr<Actor>> _pendingRemoveActors;
+	vector<Actor*> _actors[LAYER_MAXCOUNT];
+	vector<UI*> _uis;
 };
 

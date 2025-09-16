@@ -13,7 +13,7 @@ Tilemap::~Tilemap()
 
 }
 
-void Tilemap::LoadFile(const std::wstring& path)
+void Tilemap::LoadFile(const wstring& path)
 {
 	// C 스타일
 	if (false)
@@ -42,7 +42,7 @@ void Tilemap::LoadFile(const std::wstring& path)
 
 	// C++ 스타일
 	{
-		std::wifstream ifs;
+		wifstream ifs;
 
 		ifs.open(path);
 
@@ -52,7 +52,7 @@ void Tilemap::LoadFile(const std::wstring& path)
 
 		for (int32 y = 0; y < _mapSize.y; y++)
 		{
-			std::wstring line;
+			wstring line;
 			ifs >> line;
 
 			for (int32 x = 0; x < _mapSize.x; x++)
@@ -66,7 +66,7 @@ void Tilemap::LoadFile(const std::wstring& path)
 	
 }
 
-void Tilemap::SaveFile(const std::wstring& path)
+void Tilemap::SaveFile(const wstring& path)
 {
 	// C 스타일
 	if (false)
@@ -93,12 +93,12 @@ void Tilemap::SaveFile(const std::wstring& path)
 	
 	// C++ 스타일
 	{
-		std::wofstream ofs;
+		wofstream ofs;
 
 		ofs.open(path);
 
-		ofs << _mapSize.x << std::endl;
-		ofs << _mapSize.y << std::endl;
+		ofs << _mapSize.x << endl;
+		ofs << _mapSize.y << endl;
 
 		for (int32 y = 0; y < _mapSize.y; y++)
 		{
@@ -107,7 +107,7 @@ void Tilemap::SaveFile(const std::wstring& path)
 				ofs << _tiles[y][x].value;
 			}
 
-			ofs << std::endl;
+			ofs << endl;
 		}
 
 		ofs.close();
@@ -126,7 +126,7 @@ void Tilemap::SetMapSize(Vec2Int size)
 {
 	_mapSize = size;
 
-	_tiles = std::vector<std::vector<Tile>>(size.y, std::vector<Tile>(size.x));
+	_tiles = vector<vector<Tile>>(size.y, vector<Tile>(size.x));
 
 	for (int32 y = 0; y < size.y; y++)
 	{

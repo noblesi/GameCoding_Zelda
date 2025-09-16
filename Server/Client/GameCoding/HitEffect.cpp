@@ -27,7 +27,7 @@ void HitEffect::Tick()
 	if (IsAnimationEnded())
 	{
 		Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
-		scene->RemoveActor(shared_from_this());
+		scene->RemoveActor(this);
 	}
 }
 

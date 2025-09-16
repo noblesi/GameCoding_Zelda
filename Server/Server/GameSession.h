@@ -6,7 +6,7 @@ class GameSession : public PacketSession
 public:
 	~GameSession()
 	{
-		std::cout << "~GameSession" << std::endl;
+		cout << "~GameSession" << endl;
 	}
 
 	virtual void OnConnected() override;
@@ -17,6 +17,6 @@ public:
 	GameSessionRef GetSessionRef() { return static_pointer_cast<GameSession>(shared_from_this()); }
 
 public:
-	std::weak_ptr<GameRoom> gameRoom;
-	std::weak_ptr<Player> player;
+	weak_ptr<GameRoom> gameRoom;
+	weak_ptr<Player> player;
 };

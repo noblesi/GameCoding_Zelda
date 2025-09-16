@@ -41,7 +41,7 @@ void TilemapActor::Render(HDC hdc)
 	const Vec2Int mapSize = _tilemap->GetMapSize();
 	const int32 tileSize = _tilemap->GetTileSize();
 
-	std::vector<std::vector<Tile>>& tiles = _tilemap->GetTiles();
+	vector<vector<Tile>>& tiles = _tilemap->GetTiles();
 
 	Sprite* spriteO = GET_SINGLE(ResourceManager)->GetSprite(L"TileO");
 	Sprite* spriteX = GET_SINGLE(ResourceManager)->GetSprite(L"TileX");

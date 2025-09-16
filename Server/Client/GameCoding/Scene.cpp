@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Actor.h"
 #include "Creature.h"
+#include "UI.h"
 #include "TimeManager.h"
 #include "SceneManager.h"
 
@@ -12,53 +13,58 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	for (auto& layer : _actors)
-		layer.clear();
+	for (const vector<Actor*>& actors : _actors)
+		for (Actor* actor : actors)
+			SAFE_DELETE(actor);
+
+	_actors->clear();
+
+	for (UI* ui : _uis)
+		SAFE_DELETE(ui);
+
+	_uis.clear();
 }
 
 void Scene::Init()
 {
-	for (const auto& actors : _actors)
-		for (const std::shared_ptr<Actor>& actor : actors)
+	for (const vector<Actor*>& actors : _actors)
+		for (Actor* actor : actors)
 			actor->BeginPlay();
+
+	for (UI* ui : _uis)
+		ui->BeginPlay();
 }
 
 void Scene::Update()
 {
 	float deltaTime = GET_SINGLE(TimeManager)->GetDeltaTime();
 
-	for (int layer = 0; layer < LAYER_MAXCOUNT; ++layer)
-	{
-		auto actors = _actors[layer];
-		for (const auto& actor : actors)
+	// 
+	for (const vector<Actor*> actors : _actors)
+		for (Actor* actor : actors)
 			actor->Tick();
-	}
 
-	if (_pendingRemoveActors.empty() == false)
-	{
-		for (const auto& actor : _pendingRemoveActors)
-		{
-			std::vector<std::shared_ptr<Actor>>& v = _actors[actor->GetLayer()];
-			v.erase(std::remove(v.begin(), v.end(), actor), v.end());
-		}
-		_pendingRemoveActors.clear();
-	}
+	for (UI* ui : _uis)
+		ui->Tick();
 }
 
 void Scene::Render(HDC hdc)
 {
-	std::vector<std::shared_ptr<Actor>>& actors = _actors[LAYER_OBJECT];
-	std::sort(actors.begin(), actors.end(), [=](const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b)
-	{
-		return a->GetPos().y < b->GetPos().y;
-	});
+	vector<Actor*>& actors = _actors[LAYER_OBJECT];
+	std::sort(actors.begin(), actors.end(), [=](Actor* a, Actor* b)
+		{
+			return a->GetPos().y < b->GetPos().y;
+		});
 
-	for (const auto& actors : _actors)
-		for (const std::shared_ptr<Actor> actor : actors)
+	for (const vector<Actor*>& actors : _actors)
+		for (Actor* actor : actors)
 			actor->Render(hdc);
+
+	for (UI* ui : _uis)
+		ui->Render(hdc);
 }
 
-void Scene::AddActor(std::shared_ptr<Actor> actor)
+void Scene::AddActor(Actor* actor)
 {
 	if (actor == nullptr)
 		return;
@@ -66,20 +72,21 @@ void Scene::AddActor(std::shared_ptr<Actor> actor)
 	_actors[actor->GetLayer()].push_back(actor);
 }
 
-void Scene::RemoveActor(std::shared_ptr<Actor> actor)
+void Scene::RemoveActor(Actor* actor)
 {
 	if (actor == nullptr)
 		return;
 
-	_pendingRemoveActors.push_back(actor);
+	vector<Actor*>& v = _actors[actor->GetLayer()];
+	v.erase(std::remove(v.begin(), v.end(), actor), v.end());
 }
 
 Creature* Scene::GetCreatureAt(Vec2Int cellPos)
 {
-	for (const std::shared_ptr<Actor> actor : _actors[LAYER_OBJECT])
+	for (Actor* actor : _actors[LAYER_OBJECT])
 	{
 		// GameObjectType
-		Creature* creature = dynamic_cast<Creature*>(actor.get());
+		Creature* creature = dynamic_cast<Creature*>(actor);
 		if (creature && creature->GetCellPos() == cellPos)
 			return creature;
 	}

@@ -4,7 +4,7 @@
 #include "Monster.h"
 #include "GameRoom.h"
 
-std::atomic<uint64> GameObject::s_idGenerator = 1;
+atomic<uint64> GameObject::s_idGenerator = 1;
 
 void GameObject::Update()
 {
@@ -13,7 +13,7 @@ void GameObject::Update()
 
 PlayerRef GameObject::CreatePlayer()
 {
-	PlayerRef player = std::make_shared<Player>();
+	PlayerRef player = make_shared<Player>();
 	player->info.set_objectid(s_idGenerator++);
 	player->info.set_objecttype(Protocol::OBJECT_TYPE_PLAYER);
 
@@ -22,7 +22,7 @@ PlayerRef GameObject::CreatePlayer()
 
 MonsterRef GameObject::CreateMonster()
 {
-	MonsterRef monster = std::make_shared<Monster>();
+	MonsterRef monster = make_shared<Monster>();
 	monster->info.set_objectid(s_idGenerator++);
 	monster->info.set_objecttype(Protocol::OBJECT_TYPE_MONSTER);
 
@@ -35,7 +35,6 @@ void GameObject::SetState(ObjectState state, bool broadcast)
 		return;
 
 	info.set_state(state);
-	std::cout << "Object " << info.objectid() << " state changed to " << state << std::endl;
 
 	if (broadcast)
 		BroadcastMove();

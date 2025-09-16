@@ -39,7 +39,7 @@ void ServerPacketHandler::Handle_C_Move(GameSessionRef session, BYTE* buffer, in
 	// 로그 찍기
 }
 
-SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 attack, std::vector<BuffData> buffs)
+SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 attack, vector<BuffData> buffs)
 {
 	Protocol::S_TEST pkt;
 
@@ -97,13 +97,12 @@ SendBufferRef ServerPacketHandler::Make_S_RemoveObject(const Protocol::S_RemoveO
 	return MakeSendBuffer(pkt, S_RemoveObject);
 }
 
-SendBufferRef ServerPacketHandler::Make_S_Move(const Protocol::ObjectInfo& info, int32 seq)
+SendBufferRef ServerPacketHandler::Make_S_Move(const Protocol::ObjectInfo& info)
 {
 	Protocol::S_Move pkt;
 
 	Protocol::ObjectInfo* objectInfo = pkt.mutable_info();
 	*objectInfo = info;
-	pkt.set_seq(seq);
 
 	return MakeSendBuffer(pkt, S_Move);
 }

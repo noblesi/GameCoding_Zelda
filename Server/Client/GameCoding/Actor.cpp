@@ -7,11 +7,15 @@ Actor::Actor()
 
 }
 
-Actor::~Actor() = default;
+Actor::~Actor()
+{
+	for (Component* component : _components)
+		SAFE_DELETE(component);
+}
 
 void Actor::BeginPlay()
 {
-	for (auto& component : _components)
+	for (Component* component : _components)
 	{
 		component->BeginPlay();
 	}
@@ -19,7 +23,7 @@ void Actor::BeginPlay()
 
 void Actor::Tick()
 {
-	for (auto& component : _components)
+	for (Component* component : _components)
 	{
 		component->TickComponent();
 	}
@@ -27,13 +31,13 @@ void Actor::Tick()
 
 void Actor::Render(HDC hdc)
 {
-	for (auto& component : _components)
+	for (Component* component : _components)
 	{
 		component->Render(hdc);
 	}
 }
 
-void Actor::AddComponent(std::shared_ptr<Component> component)
+void Actor::AddComponent(Component* component)
 {
 	if (component == nullptr)
 		return;
@@ -42,7 +46,7 @@ void Actor::AddComponent(std::shared_ptr<Component> component)
 	_components.push_back(component);
 }
 
-void Actor::RemoveComponent(std::shared_ptr<Component> component)
+void Actor::RemoveComponent(Component* component)
 {
 	auto findIt = std::find(_components.begin(), _components.end(), component);
 	if (findIt == _components.end())
@@ -50,6 +54,7 @@ void Actor::RemoveComponent(std::shared_ptr<Component> component)
 
 	_components.erase(findIt);
 }
+
 
 void Actor::OnComponentBeginOverlap(Collider* collider, Collider* other)
 {

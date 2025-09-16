@@ -10,7 +10,7 @@ class SoundManager
 public:
 	void Init(HWND hwnd);
 
-	void Play(const std::wstring& key, bool loop = false);
+	void Play(const wstring& key, bool loop = false);
 
 	LPDIRECTSOUND GetSoundDevice() { return _soundDevice; }
 

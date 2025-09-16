@@ -23,7 +23,7 @@ void SceneManager::Render(HDC hdc)
 
 void SceneManager::Clear()
 {
-	_scene.reset();
+	SAFE_DELETE(_scene);
 }
 
 void SceneManager::ChangeScene(SceneType sceneType)
@@ -31,22 +31,24 @@ void SceneManager::ChangeScene(SceneType sceneType)
 	if (_sceneType == sceneType)
 		return;
 
-	std::unique_ptr<Scene> newScene;
+	Scene* newScene = nullptr;
 
 	switch (sceneType)
 	{
-		case SceneType::DevScene:
-			newScene = std::make_unique<DevScene>();
-			break;
-		case SceneType::EditScene:
-			newScene = std::make_unique<EditScene>();
-			break;
+	case SceneType::DevScene:
+		newScene = new DevScene();
+		break;
+	case SceneType::EditScene:
+		newScene = new EditScene();
+		break;
 	}
 
-	_scene = move(newScene);
+	SAFE_DELETE(_scene);
+
+	_scene = newScene;
 	_sceneType = sceneType;
 
-	_scene->Init();
+	newScene->Init();
 }
 
 class DevScene* SceneManager::GetDevScene()

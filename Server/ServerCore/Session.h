@@ -31,8 +31,8 @@ public:
 	bool				Connect();
 	void				Disconnect(const WCHAR* cause);
 
-	std::shared_ptr<Service>	GetService() { return _service.lock(); }
-	void				SetService(std::shared_ptr<Service> service) { _service = service; }
+	shared_ptr<Service>	GetService() { return _service.lock(); }
+	void				SetService(shared_ptr<Service> service) { _service = service; }
 
 public:
 	/* 정보 관련 */
@@ -40,7 +40,7 @@ public:
 	NetAddress			GetAddress() { return _netAddress; }
 	SOCKET				GetSocket() { return _socket; }
 	bool				IsConnected() { return _connected; }
-	SessionRef			GetSessionRef() { return std::static_pointer_cast<Session>(shared_from_this()); }
+	SessionRef			GetSessionRef() { return static_pointer_cast<Session>(shared_from_this()); }
 
 private:
 	/* 인터페이스 구현 */
@@ -69,10 +69,10 @@ protected:
 	virtual void		OnDisconnected() { }
 
 private:
-	std::weak_ptr<Service>	_service;
+	weak_ptr<Service>	_service;
 	SOCKET				_socket = INVALID_SOCKET;
 	NetAddress			_netAddress = {};
-	std::atomic<bool>		_connected = false;
+	atomic<bool>		_connected = false;
 
 private:
 	USE_LOCK;
@@ -81,8 +81,8 @@ private:
 	RecvBuffer				_recvBuffer;
 
 	/* 송신 관련 */
-	std::queue<SendBufferRef>	_sendQueue;
-	std::atomic<bool>			_sendRegistered = false;
+	queue<SendBufferRef>	_sendQueue;
+	atomic<bool>			_sendRegistered = false;
 
 private:
 	/* IocpEvent 재사용 */
@@ -108,7 +108,7 @@ public:
 	PacketSession();
 	virtual ~PacketSession();
 
-	PacketSessionRef	GetPacketSessionRef() { return std::static_pointer_cast<PacketSession>(shared_from_this()); }
+	PacketSessionRef	GetPacketSessionRef() { return static_pointer_cast<PacketSession>(shared_from_this()); }
 
 protected:
 	virtual int32		OnRecv(BYTE* buffer, int32 len) sealed;

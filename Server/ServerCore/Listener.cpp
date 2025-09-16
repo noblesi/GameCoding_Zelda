@@ -4,7 +4,6 @@
 #include "IocpEvent.h"
 #include "Session.h"
 #include "Service.h"
-#include "Logger.h"
 
 /*--------------
 	Listener
@@ -13,6 +12,13 @@
 Listener::~Listener()
 {
 	SocketUtils::Close(_socket);
+
+	for (IocpEvent* acceptEvent : _aceeptEvents)
+	{
+		// TODO
+
+		delete acceptEvent;
+	}
 }
 
 bool Listener::StartAccept(ServerServiceRef service)
@@ -43,10 +49,10 @@ bool Listener::StartAccept(ServerServiceRef service)
 	const int32 acceptCount = _service->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; i++)
 	{
-		auto acceptEvent = std::make_unique<IocpEvent>(EventType::Accept);
+		IocpEvent* acceptEvent = new IocpEvent(EventType::Accept);
 		acceptEvent->owner = shared_from_this();
-		_acceptEvents.push_back(std::move(acceptEvent));
-		RegisterAccept(_acceptEvents.back().get());
+		_acceptEvents.push_back(acceptEvent);
+		RegisterAccept(acceptEvent);
 	}
 
 	return true;
@@ -105,7 +111,7 @@ void Listener::ProcessAccept(IocpEvent* acceptEvent)
 		return;
 	}
 
-	Logger::Info("Client Connected!");
+	cout << "Client Connected!" << endl;
 
 	session->SetNetAddress(NetAddress(sockAddress));
 	session->ProcessConnect();

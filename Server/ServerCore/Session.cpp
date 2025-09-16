@@ -48,7 +48,7 @@ void Session::Disconnect(const WCHAR* cause)
 		return;
 
 	// TEMP
-	std::wcout << "Disconnect : " << cause << std::endl;
+	wcout << "Disconnect : " << cause << endl;
 
 	OnDisconnected(); // 컨텐츠 코드에서 재정의
 	GetService()->ReleaseSession(GetSessionRef());
@@ -183,7 +183,7 @@ void Session::RegisterSend()
 	}
 
 	// Scatter-Gather (흩어져 있는 데이터들을 모아서 한 방에 보낸다)
-	std::vector<WSABUF> wsaBufs;
+	vector<WSABUF> wsaBufs;
 	wsaBufs.reserve(_sendEvent.sendBuffers.size());
 	for (SendBufferRef sendBuffer : _sendEvent.sendBuffers)
 	{
@@ -303,7 +303,7 @@ void Session::HandleError(int32 errorCode)
 		break;
 	default:
 		// TODO : Log
-		std::cout << "Handle Error : " << errorCode << std::endl;
+		cout << "Handle Error : " << errorCode << endl;
 		break;
 	}
 }

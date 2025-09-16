@@ -64,7 +64,7 @@ void Arrow::TickIdle()
 			//creature->OnDamaged(this);
 		}
 
-		scene->RemoveActor(shared_from_this());
+		scene->RemoveActor(this);
 	}
 }
 

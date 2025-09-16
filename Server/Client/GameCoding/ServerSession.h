@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "ClientPacketHandler.h"
-#include "NetworkManager.h"
 
 class ServerSession : public PacketSession
 {
@@ -27,9 +26,6 @@ public:
 
 	virtual void OnDisconnected() override
 	{
-		auto* network = GET_SINGLE(NetworkManager);
-		network->SetConnected(false);
-		network->RequestReconnect();
 		//cout << "Disconnected" << endl;
 	}
 };

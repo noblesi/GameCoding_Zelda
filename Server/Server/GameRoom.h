@@ -12,7 +12,7 @@ struct PQNode
 	Vec2Int pos;
 };
 
-class GameRoom : public std::enable_shared_from_this<GameRoom>
+class GameRoom : public enable_shared_from_this<GameRoom>
 {
 public:
 	GameRoom();
@@ -37,27 +37,14 @@ public:
 
 public:
 	PlayerRef FindClosestPlayer(Vec2Int pos);
-	bool FindPath(Vec2Int src, Vec2Int dest, std::vector<Vec2Int>& path, int32 maxDepth = 10);
-	bool CanGo(Vec2Int cellPos, uint64 ignoreId = 0);
+	bool FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 maxDepth = 10);
+	bool CanGo(Vec2Int cellPos);
 	Vec2Int GetRandomEmptyCellPos();
-	GameObjectRef GetGameObjectAt(Vec2Int cellPos, uint64 ignoreId = 0);
+	GameObjectRef GetGameObjectAt(Vec2Int cellPos);
 
 private:
-	void ProcessMoveRequests();
-
-	struct MoveRequest
-	{
-		PlayerRef player;
-		uint64 id;
-		Vec2Int targetPos;
-		ObjectState state;
-		Dir dir;
-	};
-
-	std::vector<MoveRequest> _moveRequests;
-
-	std::map<uint64, PlayerRef> _players;
-	std::map<uint64, MonsterRef> _monsters;
+	map<uint64, PlayerRef> _players;
+	map<uint64, MonsterRef> _monsters;
 	Tilemap _tilemap;
 };
 

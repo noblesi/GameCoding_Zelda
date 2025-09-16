@@ -120,7 +120,7 @@ void Player::TickSkill()
 		}
 		else if (_weaponType == WeaponType::Bow)
 		{
-			auto arrow = scene->SpawnObject<Arrow>(GetCellPos());
+			Arrow* arrow = scene->SpawnObject<Arrow>(GetCellPos());
 			arrow->SetDir(info.dir());	
 		}
 

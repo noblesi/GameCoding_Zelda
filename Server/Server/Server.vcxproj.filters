@@ -109,9 +109,6 @@
     <ClInclude Include="Tilemap.h">
       <Filter>소스 파일\Game\Room</Filter>
     </ClInclude>
-    <ClInclude Include="Shutdown.h">
-      <Filter>소스 파일\Main</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\protoc-21.12-win64\bin\GenPackets.bat">
