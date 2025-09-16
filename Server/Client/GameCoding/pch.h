@@ -17,7 +17,7 @@
 // C++20
 #include <format>
 #include <filesystem>
-namespace fs = filesystem;
+namespace fs = std::filesystem;
 
 #define _CRTDEBG_MAP_ALLOC
 #include <cstdlib>

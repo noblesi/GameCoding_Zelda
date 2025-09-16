@@ -3,7 +3,7 @@
 
 struct PQNode
 {
-	PQNode(int32 cost, Vec2Int pos) : cost(cost), pos(pos) { }
+	PQNode(int32 cost, Vec2Int pos) : cost(cost), pos(pos) {}
 
 	bool operator<(const PQNode& other) const { return cost < other.cost; }
 	bool operator>(const PQNode& other) const { return cost > other.cost; }

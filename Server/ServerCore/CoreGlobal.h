@@ -2,4 +2,4 @@
 
 class ThreadManager;
 
-unique_ptr<ThreadManager> GThreadManager = make_unique<ThreadManager>();
+extern std::unique_ptr<ThreadManager> GThreadManager;

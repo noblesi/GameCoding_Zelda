@@ -341,7 +341,7 @@ bool GameRoom::FindPath(Vec2Int src, Vec2Int dest, vector<Vec2Int>& path, int32 
 	return true;
 }
 
-bool GameRoom::CanGo(Vec2Int cellPos, uint64 ignoreId)
+bool GameRoom::CanGo(Vec2Int cellPos)
 {
 	Tile* tile = _tilemap.GetTileAt(cellPos);
 	if (tile == nullptr)

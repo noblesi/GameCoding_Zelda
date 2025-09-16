@@ -13,7 +13,7 @@ Listener::~Listener()
 {
 	SocketUtils::Close(_socket);
 
-	for (IocpEvent* acceptEvent : _aceeptEvents)
+	for (IocpEvent* acceptEvent : _acceptEvents)
 	{
 		// TODO
 

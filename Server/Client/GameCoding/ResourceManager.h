@@ -1,12 +1,11 @@
 ﻿#pragma once
 
+class ResourceBase;
 class Texture;
 class Sprite;
 class Flipbook;
 class Tilemap;
 class Sound;
-
-class ResourceBase;
 
 class ResourceManager
 {
@@ -47,4 +46,4 @@ private:
 	unordered_map<wstring, Flipbook*> _flipbooks;
 	unordered_map<wstring, Tilemap*> _tilemaps;
 	unordered_map<wstring, Sound*> _sounds;
-}
+};
