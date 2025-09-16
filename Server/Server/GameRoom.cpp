@@ -60,8 +60,6 @@ void GameRoom::EnterRoom(GameSessionRef session)
 		session->Send(sendBuffer);
 	}
 
-	AddObject(player);
-
 	// 모든 오브젝트 정보 전송
 	{
 		Protocol::S_AddObject pkt;
