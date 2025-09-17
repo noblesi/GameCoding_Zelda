@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FlipbookActor.h"
 #include "Creature.h"
@@ -25,8 +25,11 @@ protected:
 
 	virtual void UpdateAnimation() override;
 
-	void SetWeaponType(WeaponType weaponType) { _weaponType = weaponType; }
+	void SetWeaponType(WeaponType weaponType);
 	WeaponType GetWeaponType() { return _weaponType; }
+
+public:
+	void RefreshStatFromInfo();
 
 private:
 	Flipbook* _flipbookIdle[4] = {};

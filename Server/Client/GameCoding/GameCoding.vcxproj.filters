@@ -224,6 +224,9 @@
     <ClInclude Include="UI.h">
       <Filter>소스 파일\06. UI</Filter>
     </ClInclude>
+    <ClInclude Include="Staff.h">
+      <Filter>소스 파일\03. Objects\Game\Projectile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameCoding.rc">
@@ -361,6 +364,9 @@
     </ClCompile>
     <ClCompile Include="UI.cpp">
       <Filter>소스 파일\06. UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Staff.cpp">
+      <Filter>소스 파일\03. Objects\Game\Projectile</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

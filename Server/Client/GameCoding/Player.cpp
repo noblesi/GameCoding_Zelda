@@ -8,7 +8,70 @@
 #include "SceneManager.h"
 #include "DevScene.h"
 #include "Arrow.h"
+#include "Staff.h"
 #include "HitEffect.h"
+
+namespace
+{
+	using WeaponStatArray = std::array<Stat, 3>;
+
+	const WeaponStatArray kWeaponBaseStats =
+	{
+	Stat{ 100, 100, 15, 5, 200.f },
+	Stat{ 100, 100, 12, 3, 220.f },
+	Stat{ 100, 100, 18, 2, 180.f }
+	};
+
+	size_t ToIndex(WeaponType type)
+	{
+		return static_cast<size_t>(type);
+	}
+
+	const Stat& GetWeaponBaseStat(WeaponType type)
+	{
+		return kWeaponBaseStats[ToIndex(type)];
+	}
+
+	WeaponType ResolveWeaponType(int32 attack, WeaponType current)
+	{
+		for (size_t i = 0; i < kWeaponBaseStats.size(); ++i)
+		{
+			if (kWeaponBaseStats[i].attack == attack)
+				return static_cast<WeaponType>(i);
+		}
+
+		return current;
+	}
+
+	bool SyncInfoWithStat(Protocol::ObjectInfo& info, const Stat& stat)
+	{
+		bool changed = false;
+
+		if (info.hp() != stat.hp)
+		{
+			info.set_hp(stat.hp);
+			changed = true;
+		}
+		if (info.maxhp() != stat.maxHp)
+		{
+			info.set_maxhp(stat.maxHp);
+			changed = true;
+		}
+		if (info.attack() != stat.attack)
+		{
+			info.set_attack(stat.attack);
+			changed = true;
+		}
+		if (info.defence() != stat.defence)
+		{
+			info.set_defence(stat.defence);
+			changed = true;
+		}
+
+		return changed;
+	}
+}
+
 
 Player::Player()
 {
@@ -36,6 +99,9 @@ Player::Player()
 	_flipbookStaff[DIR_DOWN] = GET_SINGLE(ResourceManager)->GetFlipbook(L"FB_StaffDown");
 	_flipbookStaff[DIR_LEFT] = GET_SINGLE(ResourceManager)->GetFlipbook(L"FB_StaffLeft");
 	_flipbookStaff[DIR_RIGHT] = GET_SINGLE(ResourceManager)->GetFlipbook(L"FB_StaffRight");
+
+	_stat = GetWeaponBaseStat(_weaponType);
+	SyncInfoWithStat(info, _stat);
 }
 
 Player::~Player()
@@ -70,8 +136,9 @@ void Player::TickIdle()
 void Player::TickMove()
 {
 	float deltaTime = GET_SINGLE(TimeManager)->GetDeltaTime();
+	float moveSpeed = (_stat.speed < 0.f) ? 0.f : _stat.speed;
 
-	Vec2 dir = (_destPos - _pos);	
+	Vec2 dir = (_destPos - _pos);
 	if (dir.Length() < 1.f)
 	{
 		SetState(IDLE);
@@ -82,19 +149,19 @@ void Player::TickMove()
 		switch (info.dir())
 		{
 		case DIR_UP:
-			_pos.y -= 200 * deltaTime;
+			_pos.y -= moveSpeed * deltaTime;
 			break;
 		case DIR_DOWN:
-			_pos.y += 200 * deltaTime;
+			_pos.y += moveSpeed * deltaTime;
 			break;
 		case DIR_LEFT:
-			_pos.x -= 200 * deltaTime;
+			_pos.x -= moveSpeed * deltaTime;
 			break;
 		case DIR_RIGHT:
-			_pos.x += 200 * deltaTime;
+			_pos.x += moveSpeed * deltaTime;
 			break;
 		}
-	}	
+	}
 }
 
 void Player::TickSkill()
@@ -123,6 +190,11 @@ void Player::TickSkill()
 			Arrow* arrow = scene->SpawnObject<Arrow>(GetCellPos());
 			arrow->SetDir(info.dir());	
 		}
+		else if (_weaponType == WeaponType::Staff)
+		{
+			Staff* staff = scene->SpawnObject<Staff>(GetCellPos());
+			staff->SetDir(info.dir());
+		}
 
 		SetState(IDLE);
 	}
@@ -147,4 +219,65 @@ void Player::UpdateAnimation()
 			SetFlipbook(_flipbookStaff[info.dir()]);
 		break;
 	}
+}
+
+void Player::SetWeaponType(WeaponType weaponType)
+{
+	const Stat& baseStat = GetWeaponBaseStat(weaponType);
+
+	Stat nextStat = baseStat;
+	nextStat.hp = _stat.hp;
+	nextStat.maxHp = _stat.maxHp;
+
+	bool dirty = (_weaponType != weaponType) ||
+		(_stat.attack != nextStat.attack) ||
+		(_stat.defence != nextStat.defence) ||
+		(_stat.speed != nextStat.speed);
+
+	_weaponType = weaponType;
+	_stat = nextStat;
+	if (SyncInfoWithStat(info, _stat))
+		dirty = true;
+
+	if (dirty)
+		_dirtyFlag = true;
+}
+
+void Player::RefreshStatFromInfo()
+{
+	WeaponType resolvedType = ResolveWeaponType(info.attack(), _weaponType);
+	const Stat& baseStat = GetWeaponBaseStat(resolvedType);
+
+	Stat stat = baseStat;
+
+	int32 maxHp = info.maxhp();
+	if (maxHp <= 0)
+		maxHp = baseStat.maxHp;
+	stat.maxHp = maxHp;
+
+	int32 hp = info.hp();
+	if (hp < 0)
+		hp = 0;
+	if (hp == 0 && info.maxhp() == 0)
+		hp = stat.maxHp;
+	if (hp > stat.maxHp)
+		hp = stat.maxHp;
+	stat.hp = hp;
+
+	int32 attack = info.attack();
+	if (attack == 0)
+		attack = baseStat.attack;
+	stat.attack = attack;
+
+	int32 defence = info.defence();
+	if (defence == 0)
+		defence = baseStat.defence;
+	stat.defence = defence;
+
+	stat.speed = baseStat.speed;
+
+	_weaponType = resolvedType;
+	_stat = stat;
+
+	SyncInfoWithStat(info, _stat);
 }

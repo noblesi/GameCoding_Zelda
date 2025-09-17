@@ -4,6 +4,7 @@
 #include "DevScene.h"
 #include "MyPlayer.h"
 #include "SceneManager.h"
+#include "Creature.h"
 
 void ClientPacketHandler::HandlePacket(ServerSessionRef session, BYTE* buffer, int32 len)
 {
@@ -87,6 +88,7 @@ void ClientPacketHandler::Handle_S_MyPlayer(ServerSessionRef session, BYTE* buff
 	{
 		MyPlayer* myPlayer = scene->SpawnObject<MyPlayer>(Vec2Int{info.posx(), info.posy()});
 		myPlayer->info = info;
+		myPlayer->RefreshStatFromInfo();
 		GET_SINGLE(SceneManager)->SetMyPlayer(myPlayer);
 	}
 }
@@ -142,6 +144,32 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 		GameObject* gameObject = scene->GetObject(info.objectid());
 		if (gameObject)
 		{
+			gameObject->info.set_attack(info.attack());
+			gameObject->info.set_defence(info.defence());
+			gameObject->info.set_hp(info.hp());
+			gameObject->info.set_maxhp(info.maxhp());
+
+			if (Creature* creature = dynamic_cast<Creature*>(gameObject))
+			{
+				Stat stat = creature->GetStat();
+				if (info.maxhp() != 0)
+					stat.maxHp = info.maxhp();
+				int32 hp = info.hp();
+				if (hp < 0)
+					hp = 0;
+				if (stat.maxHp > 0 && hp > stat.maxHp)
+					hp = stat.maxHp;
+				stat.hp = hp;
+				stat.attack = info.attack();
+				stat.defence = info.defence();
+				creature->SetStat(stat);
+			}
+
+			if (Player* player = dynamic_cast<Player*>(gameObject))
+			{
+				player->RefreshStatFromInfo();
+			}
+
 			gameObject->SetDir(info.dir());
 			gameObject->SetState(info.state());
 			gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });

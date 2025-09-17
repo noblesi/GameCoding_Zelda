@@ -17,6 +17,7 @@
 #include "Monster.h"
 #include "MyPlayer.h"
 #include "SceneManager.h"
+#include "Values.h"
 
 DevScene::DevScene()
 {
@@ -33,6 +34,7 @@ void DevScene::Init()
 	GET_SINGLE(ResourceManager)->LoadTexture(L"Tile", L"Sprite\\Map\\Tile.bmp", RGB(128, 128, 128));
 	GET_SINGLE(ResourceManager)->LoadTexture(L"Sword", L"Sprite\\Item\\Sword.bmp");
 	GET_SINGLE(ResourceManager)->LoadTexture(L"Arrow", L"Sprite\\Item\\Arrow.bmp", RGB(128, 128, 128));
+	GET_SINGLE(ResourceManager)->LoadTexture(L"StaffProjectile", L"Sprite\\Item\\StaffProjectile.bmp", RGB(149, 149, 149));
 	GET_SINGLE(ResourceManager)->LoadTexture(L"Potion", L"Sprite\\UI\\Mp.bmp");
 	GET_SINGLE(ResourceManager)->LoadTexture(L"PlayerDown", L"Sprite\\Player\\PlayerDown.bmp", RGB(128, 128, 128));
 	GET_SINGLE(ResourceManager)->LoadTexture(L"PlayerUp", L"Sprite\\Player\\PlayerUp.bmp", RGB(128, 128, 128));
@@ -88,12 +90,30 @@ void DevScene::Render(HDC hdc)
 	MyPlayer* myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
 	if (myPlayer)
 	{
+		constexpr float margin = 20.f;
+		constexpr float lineHeight = 28.f;
+
+		// 플레이어 스탯
+		const Stat& stat = myPlayer->GetStat();
+		std::wstring statText = std::format(L"ATK: {}  DEF: {}  SPD: {:.0f}", stat.attack, stat.defence, stat.speed);
+		Utils::DrawText(hdc, Vec2{ margin, margin }, statText, RGB(0, 0, 0), 20, FW_BOLD);
+
+		std::wstring hpText = std::format(L"HP: {}/{}", myPlayer->info.hp(), myPlayer->info.maxhp());
+		Utils::DrawText(hdc, Vec2{ margin, margin + lineHeight }, hpText, RGB(0, 0, 0), 20, FW_BOLD);
+
+		// 플레이어 위치
 		Vec2Int cell = myPlayer->GetCellPos();
 		std::wstring text = std::format(L"Pos: ({}, {})", cell.x, cell.y);
-
-		Utils::DrawText(hdc, Vec2{ 20.f, 560.f }, text, RGB(0, 0, 0), 20, FW_BOLD);
+		SIZE textSize = Utils::MeasureText(hdc, text, 20, FW_BOLD);
+		float posX = static_cast<float>(GWinSizeX) - margin - static_cast<float>(textSize.cx);
+		if (posX < margin)
+		{
+			posX = margin;
+		}
+		Utils::DrawText(hdc, Vec2{ posX, margin }, text, RGB(0, 0, 0), 20, FW_BOLD);
 	}
 }
+
 
 void DevScene::AddActor(Actor* actor)
 {
@@ -268,7 +288,7 @@ void DevScene::LoadMonster()
 
 void DevScene::LoadProjectiles()
 {
-	// MOVE
+	// Arrow
 	{
 		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"Arrow");
 		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_ArrowUp");
@@ -288,6 +308,27 @@ void DevScene::LoadProjectiles()
 		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"Arrow");
 		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_ArrowRight");
 		fb->SetInfo({ texture, L"FB_ArrowRight", {100, 100}, 0, 0, 2, 0.5f });
+	}
+	// StaffProjectile
+	{
+		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"StaffProjectile");
+		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_StaffProjectileUp");
+		fb->SetInfo({ texture, L"FB_StaffProjectileUp", {32, 36}, 1, 1, 1, 0.5f });
+	}
+	{
+		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"StaffProjectile");
+		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_StaffProjectileDown");
+		fb->SetInfo({ texture, L"FB_StaffProjectileDown", {32, 36}, 1, 1, 1, 0.5f });
+	}
+	{
+		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"StaffProjectile");
+		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_StaffProjectileLeft");
+		fb->SetInfo({ texture, L"FB_StaffProjectileLeft", {32, 36}, 1, 1, 1, 0.5f });
+	}
+	{
+		Texture* texture = GET_SINGLE(ResourceManager)->GetTexture(L"StaffProjectile");
+		Flipbook* fb = GET_SINGLE(ResourceManager)->CreateFlipbook(L"FB_StaffProjectileRight");
+		fb->SetInfo({ texture, L"FB_StaffProjectileRight", {32, 36}, 1, 1, 1, 0.5f });
 	}
 }
 
@@ -333,16 +374,32 @@ void DevScene::Handle_S_AddObject(Protocol::S_AddObject& pkt)
 		if (info.objecttype() == Protocol::OBJECT_TYPE_PLAYER)
 		{
 			Player* player = SpawnObject<Player>(Vec2Int{ info.posx(), info.posy() });
+			player->info = info;
+			player->RefreshStatFromInfo();
 			player->SetDir(info.dir());
 			player->SetState(info.state());
-			player->info = info;
 		}
 		else if (info.objecttype() == Protocol::OBJECT_TYPE_MONSTER)
 		{
 			Monster* monster = SpawnObject<Monster>(Vec2Int{ info.posx(), info.posy() });
+			monster->info = info;
+			if (Creature* creature = dynamic_cast<Creature*>(monster))
+			{
+				Stat stat = creature->GetStat();
+				if (info.maxhp() != 0)
+					stat.maxHp = info.maxhp();
+				int32 hp = info.hp();
+				if (hp < 0)
+					hp = 0;
+				if (stat.maxHp > 0 && hp > stat.maxHp)
+					hp = stat.maxHp;
+				stat.hp = hp;
+				stat.attack = info.attack();
+				stat.defence = info.defence();
+				creature->SetStat(stat);
+			}
 			monster->SetDir(info.dir());
 			monster->SetState(info.state());
-			monster->info = info;
 		}
 	}
 }

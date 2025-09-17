@@ -5,6 +5,46 @@
 #include "GameSession.h"
 #include <filesystem>
 
+namespace
+{
+	struct WeaponStatData
+	{
+		int32 hp;
+		int32 maxHp;
+		int32 attack;
+		int32 defence;
+	};
+
+	const WeaponStatData kSwordStat{ 100, 100, 15, 5 };
+	const WeaponStatData kBowStat{ 100, 100, 12, 3 };
+	const WeaponStatData kStaffStat{ 100, 100, 18, 2 };
+
+	const WeaponStatData& ResolveWeaponStat(int32 attack)
+	{
+		if (attack == kBowStat.attack)
+			return kBowStat;
+		if (attack == kStaffStat.attack)
+			return kStaffStat;
+		return kSwordStat;
+	}
+
+	void ApplyWeaponStat(Protocol::ObjectInfo& info, const WeaponStatData& stat)
+	{
+		info.set_hp(stat.hp);
+		info.set_maxhp(stat.maxHp);
+		info.set_attack(stat.attack);
+		info.set_defence(stat.defence);
+	}
+
+	void SyncWeaponTemplate(Protocol::ObjectInfo& info, const WeaponStatData& stat)
+	{
+		if (info.maxhp() <= 0)
+			info.set_maxhp(stat.maxHp);
+		info.set_attack(stat.attack);
+		info.set_defence(stat.defence);
+	}
+}
+
 GameRoomRef GRoom = make_shared<GameRoom>();
 
 GameRoom::GameRoom()
@@ -53,6 +93,7 @@ void GameRoom::EnterRoom(GameSessionRef session)
 	// TEMP
 	player->info.set_posx(5);
 	player->info.set_posy(5);
+	ApplyWeaponStat(player->info, kSwordStat);
 
 	// 입장한 클라에게 정보를 보내주기
 	{
@@ -123,8 +164,26 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	gameObject->info.set_posx(pkt.info().posx());
 	gameObject->info.set_posy(pkt.info().posy());
 
+	const WeaponStatData& weaponStat = ResolveWeaponStat(pkt.info().attack());
+	SyncWeaponTemplate(gameObject->info, weaponStat);
+
+	int32 incomingMaxHp = pkt.info().maxhp();
+	if (incomingMaxHp > 0 && incomingMaxHp != gameObject->info.maxhp())
+		gameObject->info.set_maxhp(incomingMaxHp);
+
+	int32 maxHp = gameObject->info.maxhp();
+	if (maxHp <= 0)
+		maxHp = weaponStat.maxHp;
+
+	int32 hp = pkt.info().hp();
+	if (hp < 0)
+		hp = 0;
+	if (maxHp > 0 && hp > maxHp)
+		hp = maxHp;
+	gameObject->info.set_hp(hp);
+
 	{
-		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(pkt.info());
+		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
 		Broadcast(sendBuffer);
 	}
 }
