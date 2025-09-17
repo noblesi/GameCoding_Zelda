@@ -6,6 +6,44 @@ void Utils::DrawText(HDC hdc, Pos pos, const wstring& str)
 	::TextOut(hdc, static_cast<int32>(pos.x), static_cast<int32>(pos.y), str.c_str(), static_cast<int32>(str.size()));
 }
 
+void Utils::DrawText(HDC hdc, Pos pos, const wstring& str, COLORREF color, int32 fontSize, int32 fontWeight, const wchar_t* fontFace)
+{
+	if (fontSize <= 0)
+	{
+		fontSize = 1;
+	}
+
+	HFONT font = ::CreateFontW(
+		-fontSize, 0, 0, 0, fontWeight, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, fontFace);
+
+	HFONT oldFont = nullptr;
+	if (font)
+	{
+		oldFont = (HFONT)::SelectObject(hdc, font);
+	}
+
+	COLORREF oldColor = ::SetTextColor(hdc, color);
+	int oldBkMode = ::SetBkMode(hdc, TRANSPARENT);
+	Utils::DrawText(hdc, pos, str);
+
+	::SetBkMode(hdc, oldBkMode);
+	::SetTextColor(hdc, oldColor);
+
+	if (oldFont)
+	{
+		::SelectObject(hdc, oldFont);
+	}
+
+	if (font)
+	{
+		::DeleteObject(font);
+	}
+}
+
+
+
 void Utils::DrawRect(HDC hdc, Pos pos, int32 w, int32 h)
 {
 	::Rectangle(hdc, static_cast<int32>(pos.x - w / 2), static_cast<int32>(pos.y - h / 2), static_cast<int32>(pos.x + w /2), static_cast<int32>(pos.y + h / 2));

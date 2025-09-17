@@ -85,6 +85,14 @@ void DevScene::Render(HDC hdc)
 {
 	Super::Render(hdc);
 
+	MyPlayer* myPlayer = GET_SINGLE(SceneManager)->GetMyPlayer();
+	if (myPlayer)
+	{
+		Vec2Int cell = myPlayer->GetCellPos();
+		std::wstring text = std::format(L"Pos: ({}, {})", cell.x, cell.y);
+
+		Utils::DrawText(hdc, Vec2{ 20.f, 560.f }, text, RGB(0, 0, 0), 20, FW_BOLD);
+	}
 }
 
 void DevScene::AddActor(Actor* actor)

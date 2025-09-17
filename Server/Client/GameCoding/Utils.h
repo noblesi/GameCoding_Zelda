@@ -7,6 +7,7 @@ class Utils
 {
 public:
 	static void DrawText(HDC hdc, Pos pos, const wstring& str);
+	static void DrawText(HDC hdc, Pos pos, const wstring& str, COLORREF color, int32 fontSize, int32 fontWeight = FW_NORMAL, const wchar_t* fontFace = L"Arial");
 
 	static void DrawRect(HDC hdc, Pos pos, int32 w, int32 h);
 
