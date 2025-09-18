@@ -44,7 +44,7 @@ void Creature::OnDamaged(Creature* attacker)
 
     int32 damage = attackerStat.attack - stat.defence;
     if (damage <= 0)
-        return;
+        damage = 1;
 
     int32 prevHp = stat.hp;
     int32 nextHp = stat.hp - damage;

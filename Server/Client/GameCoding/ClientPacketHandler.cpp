@@ -135,45 +135,47 @@ void ClientPacketHandler::Handle_S_Move(ServerSessionRef session, BYTE* buffer, 
 	const Protocol::ObjectInfo& info = pkt.info();
 
 	DevScene* scene = GET_SINGLE(SceneManager)->GetDevScene();
-	if (scene)
+	if (scene == nullptr)
+		return;
+
+	GameObject* gameObject = scene->GetObject(info.objectid());
+	if (gameObject == nullptr)
+		return;
+
+	uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
+	bool isMyPlayer = (myPlayerId == info.objectid());
+
+	gameObject->info.set_attack(info.attack());
+	gameObject->info.set_defence(info.defence());
+	gameObject->info.set_hp(info.hp());
+	gameObject->info.set_maxhp(info.maxhp());
+
+	if (Creature* creature = dynamic_cast<Creature*>(gameObject))
 	{
-		uint64 myPlayerId = GET_SINGLE(SceneManager)->GetMyPlayerId();
-		if (myPlayerId == info.objectid())
-			return;
+		Stat stat = creature->GetStat();
+		if (info.maxhp() != 0)
+			stat.maxHp = info.maxhp();
+		int32 hp = info.hp();
+		if (hp < 0)
+			hp = 0;
+		if (stat.maxHp > 0 && hp > stat.maxHp)
+			hp = stat.maxHp;
+		stat.hp = hp;
+		stat.attack = info.attack();
+		stat.defence = info.defence();
+		creature->SetStat(stat);
+	}
 
-		GameObject* gameObject = scene->GetObject(info.objectid());
-		if (gameObject)
-		{
-			gameObject->info.set_attack(info.attack());
-			gameObject->info.set_defence(info.defence());
-			gameObject->info.set_hp(info.hp());
-			gameObject->info.set_maxhp(info.maxhp());
+	if (Player* player = dynamic_cast<Player*>(gameObject))
+	{
+		player->RefreshStatFromInfo();
+	}
 
-			if (Creature* creature = dynamic_cast<Creature*>(gameObject))
-			{
-				Stat stat = creature->GetStat();
-				if (info.maxhp() != 0)
-					stat.maxHp = info.maxhp();
-				int32 hp = info.hp();
-				if (hp < 0)
-					hp = 0;
-				if (stat.maxHp > 0 && hp > stat.maxHp)
-					hp = stat.maxHp;
-				stat.hp = hp;
-				stat.attack = info.attack();
-				stat.defence = info.defence();
-				creature->SetStat(stat);
-			}
-
-			if (Player* player = dynamic_cast<Player*>(gameObject))
-			{
-				player->RefreshStatFromInfo();
-			}
-
-			gameObject->SetDir(info.dir());
-			gameObject->SetState(info.state());
-			gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });
-		}
+	if (isMyPlayer == false)
+	{
+		gameObject->SetDir(info.dir());
+		gameObject->SetState(info.state());
+		gameObject->SetCellPos(Vec2Int{ info.posx(), info.posy() });
 	}
 }
 
