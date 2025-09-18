@@ -33,6 +33,7 @@ public:
 public:
 	void AddObject(GameObjectRef gameObject);
 	void RemoveObject(uint64 id);
+	void ApplyDamage(GameObjectRef attacker, GameObjectRef victim);
 	void Broadcast(SendBufferRef& sendBuffer);
 
 public:

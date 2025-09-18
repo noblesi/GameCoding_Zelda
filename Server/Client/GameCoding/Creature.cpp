@@ -42,17 +42,30 @@ void Creature::OnDamaged(Creature* attacker)
 	Stat& attackerStat = attacker->GetStat();
 	Stat& stat = GetStat();
 
-	int32 damage = attackerStat.attack - stat.defence;
-	if (damage <= 0)
-		return;
+    int32 damage = attackerStat.attack - stat.defence;
+    if (damage <= 0)
+        return;
 
-	stat.hp = max(0, stat.hp - damage);
-	if (stat.hp == 0)
-	{
-		Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
-		if (scene)
-		{
-			scene->RemoveActor(this);
-		}
-	}
+    int32 prevHp = stat.hp;
+    int32 nextHp = stat.hp - damage;
+    if (nextHp < 0)
+        nextHp = 0;
+    if (nextHp > stat.maxHp)
+        nextHp = stat.maxHp;
+
+    if (nextHp == prevHp)
+        return;
+
+    stat.hp = nextHp;
+    info.set_hp(stat.hp);
+    _dirtyFlag = true;
+
+    if (stat.hp == 0)
+    {
+        Scene* scene = GET_SINGLE(SceneManager)->GetCurrentScene();
+        if (scene)
+        {
+            scene->RemoveActor(this);
+        }
+    }
 }

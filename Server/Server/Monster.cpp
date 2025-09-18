@@ -96,4 +96,31 @@ void Monster::UpdateSkill()
 		return;
 
 	SetState(IDLE);
+
+	if (room)
+	{
+		PlayerRef target = _target.lock();
+		if (target == nullptr || target->room.get() != room.get())
+		{
+			_target.reset();
+		}
+		else
+		{
+			Vec2Int dir = target->GetCellPos() - GetCellPos();
+			int32 dist = abs(dir.x) + abs(dir.y);
+			if (dist == 1)
+			{
+				GameObjectRef self = room->FindObject(info.objectid());
+				GameObjectRef victim = static_pointer_cast<GameObject>(target);
+				if (self && victim)
+				{
+					room->ApplyDamage(self, victim);
+					if (victim->info.hp() <= 0)
+						_target.reset();
+				}
+			}
+		}
+	}
+
+	BroadcastMove();
 }

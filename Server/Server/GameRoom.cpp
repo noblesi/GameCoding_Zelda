@@ -191,6 +191,7 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 		return;
 
 	// TODO : Validation
+	ObjectState prevState = gameObject->info.state();
 	gameObject->info.set_state(pkt.info().state());
 	gameObject->info.set_dir(pkt.info().dir());
 	gameObject->info.set_posx(pkt.info().posx());
@@ -207,12 +208,17 @@ void GameRoom::Handle_C_Move(Protocol::C_Move& pkt)
 	if (maxHp <= 0)
 		maxHp = weaponStat.maxHp;
 
-	int32 hp = pkt.info().hp();
-	if (hp < 0)
-		hp = 0;
-	if (maxHp > 0 && hp > maxHp)
-		hp = maxHp;
-	gameObject->info.set_hp(hp);
+	if (maxHp > 0 && gameObject->info.hp() > maxHp)
+		gameObject->info.set_hp(maxHp);
+	if (gameObject->info.hp() < 0)
+		gameObject->info.set_hp(0);
+
+	if (gameObject->info.objecttype() == Protocol::OBJECT_TYPE_PLAYER)
+	{
+		PlayerRef player = static_pointer_cast<Player>(gameObject);
+		if (prevState != SKILL && gameObject->info.state() == SKILL)
+			player->ProcessSkill();
+	}
 
 	{
 		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(gameObject->info);
@@ -280,6 +286,40 @@ void GameRoom::RemoveObject(uint64 id)
 		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_RemoveObject(pkt);
 		Broadcast(sendBuffer);
 	}
+}
+
+void GameRoom::ApplyDamage(GameObjectRef attacker, GameObjectRef victim)
+{
+	if (attacker == nullptr || victim == nullptr)
+		return;
+
+	if (attacker->room.get() != this || victim->room.get() != this)
+		return;
+
+	Protocol::ObjectInfo& attackerInfo = attacker->info;
+	Protocol::ObjectInfo& victimInfo = victim->info;
+
+	int32 damage = attackerInfo.attack() - victimInfo.defence();
+	damage = std::max<int32>(1, damage);
+
+	int32 maxHp = victimInfo.maxhp();
+	if (maxHp > 0 && victimInfo.hp() > maxHp)
+		victimInfo.set_hp(maxHp);
+
+	int32 newHp = victimInfo.hp() - damage;
+	if (newHp < 0)
+		newHp = 0;
+
+	victimInfo.set_hp(newHp);
+
+	if (newHp <= 0)
+	{
+		RemoveObject(victimInfo.objectid());
+		return;
+	}
+
+	SendBufferRef sendBuffer = ServerPacketHandler::Make_S_Move(victimInfo);
+	Broadcast(sendBuffer);
 }
 
 void GameRoom::Broadcast(SendBufferRef& sendBuffer)

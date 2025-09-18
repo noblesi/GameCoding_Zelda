@@ -10,4 +10,7 @@ public:
 
 public:
 	GameSessionRef session;
+
+public:
+	void ProcessSkill();
 };
