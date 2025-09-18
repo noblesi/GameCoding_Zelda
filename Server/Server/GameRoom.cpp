@@ -64,7 +64,39 @@ void GameRoom::Init()
 	monster->info.set_posy(8);
 	AddObject(monster);
 
-	filesystem::path tilemapPath = filesystem::current_path() / "Resources" / "Tilemap" / "Tilemap_01.txt";
+	filesystem::path basePath = filesystem::current_path();
+	filesystem::path currentPath = basePath;
+	filesystem::path targetRelative = filesystem::path("Client") / "Resources" / "Tilemap";
+	filesystem::path tilemapDir;
+
+	while (true)
+	{
+		filesystem::path candidate = (currentPath / targetRelative).lexically_normal();
+		if (filesystem::exists(candidate))
+		{
+			tilemapDir = candidate;
+			break;
+		}
+
+		if (!currentPath.has_parent_path() || currentPath == currentPath.parent_path())
+			break;
+
+		currentPath = currentPath.parent_path();
+	}
+
+	if (tilemapDir.empty())
+	{
+		wcout << L"Failed to locate tilemap directory from base path: " << basePath << std::endl;
+		return;
+	}
+
+	filesystem::path tilemapPath = (tilemapDir / "Tilemap_01.txt").lexically_normal();
+	if (!filesystem::exists(tilemapPath))
+	{
+		wcout << L"Failed to locate tilemap file: " << tilemapPath << std::endl;
+		return;
+	}
+
 	_tilemap.LoadFile(tilemapPath.wstring());
 }
 
